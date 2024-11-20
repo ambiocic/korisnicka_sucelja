@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Navigation } from "../components/Navigation";  // Assuming the Navigation component is already created
 
 export default function SignInRegister() {
-  const [formType, setFormType] = useState("signin");
 
   return (
     <div className="bg-white text-black min-h-screen flex flex-col">

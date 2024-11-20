@@ -17,7 +17,7 @@ const pages = [
 ];
 
 // Function to process each page and display icon + text
-function processPage(page: { title: string; path: string; icon: JSX.Element | null }, index: number, pathname: string) {
+function processPage(page: { title: string; path: string; icon: JSX.Element | null }, index: number ) {
   return (
     <li key={index} className="flex items-center space-x-2 rounded-full px-3 py-2">
       <Link
@@ -32,7 +32,6 @@ function processPage(page: { title: string; path: string; icon: JSX.Element | nu
 }
 
 export function Navigation() {
-  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu toggle
 
   return (
@@ -43,12 +42,12 @@ export function Navigation() {
 
         {/* Center: Menu Links (Movies, TV Shows, Blog) */}
         <div className="hidden md:flex space-x-6">
-          {pages.slice(1, 4).map((page, index) => processPage(page, index, pathname))}
+          {pages.slice(1, 4).map((page, index) => processPage(page, index ))}
         </div>
 
         {/* Right side: Account and About Us */}
         <div className="hidden md:flex space-x-6">
-          {pages.slice(4).map((page, index) => processPage(page, index, pathname))}
+          {pages.slice(4).map((page, index) => processPage(page, index))}
         </div>
 
         {/* Mobile Hamburger Menu */}
@@ -67,8 +66,8 @@ export function Navigation() {
       <div
         className={`md:hidden ${isMenuOpen ? "block" : "hidden"} bg-gray-800 p-4 space-y-4`}
       >
-        {pages.slice(1, 4).map((page, index) => processPage(page, index, pathname))}
-        {pages.slice(4).map((page, index) => processPage(page, index, pathname))}
+        {pages.slice(1, 4).map((page, index) => processPage(page, index))}
+        {pages.slice(4).map((page, index) => processPage(page, index))}
       </div>
     </nav>
   );

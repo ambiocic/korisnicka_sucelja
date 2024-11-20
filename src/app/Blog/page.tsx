@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Navigation } from "../components/Navigation";
 
 // Sample blog data
@@ -21,11 +20,6 @@ const interviews = [
 ];
 
 export default function Blog() {
-  const [filters, setFilters] = useState({
-    category: "All",
-    date: "All",
-    author: "All",
-  });
 
   return (
     <div className="bg-white text-black min-h-screen">
