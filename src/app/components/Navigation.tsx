@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { FaFilm, FaTv, FaRegNewspaper, FaUserAlt, FaInfoCircle, FaBars, FaTimes } from "react-icons/fa";
 import { Logo } from "./Logo";
 
