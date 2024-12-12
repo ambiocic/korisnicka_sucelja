@@ -27,6 +27,7 @@
 - Link to Assignment 1: [**Assignment 1**](assignments/assignment-1/figma.mp4) <!-- Replace with actual URL -->
 - Link to Assignment 2: [**Assignment 2**](assignments/assignment-2/user_personas_and_information_architecture.docx) <!-- Replace with actual URL -->
 - Link to Assignment 3: [**Assignment 3**](https://korisnicka-sucelja-ruby.vercel.app/) <!-- Replace with actual URL -->
+- Link to Assignment 4: [**Assignment 4**](assignments/assignment-4/assignment-4.md) <!-- Replace with actual URL -->
 <!-- Add more assignments as necessary -->
 
 ## Project Requirements
