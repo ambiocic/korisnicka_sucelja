@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Post } from "../page"; 
+import type { Post } from "../page"; 
 import { BASE_API_URL } from "../page";
 
 export const metadata: Metadata = {
