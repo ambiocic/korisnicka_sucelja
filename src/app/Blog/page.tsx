@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: "Blog",
 };
 
-export const BASE_API_URL = "https://jsonplaceholder.typicode.com";
+export const BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 const PAGE_SIZE = 12;
 
 // Fetch posts for the current page
@@ -110,10 +110,12 @@ function Pagination({ currentPage, pagesCount }: PaginationProps) {
 
 // Main BlogPage component
 export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const { page } = await searchParams; // Awaiting searchParams
+  
   const postsCount = await getPostsCount();
   const pagesCount = Math.ceil(postsCount / PAGE_SIZE);
   const currentPage = Math.min(
-    /^[1-9][0-9]*$/.test(searchParams.page) ? Number(searchParams.page) : 1,
+    /^[1-9][0-9]*$/.test(page) ? Number(page) : 1,
     pagesCount
   );
   const _start = (currentPage - 1) * PAGE_SIZE;

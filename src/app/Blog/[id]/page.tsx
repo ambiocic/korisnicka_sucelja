@@ -15,11 +15,15 @@ async function getPostById(id: string): Promise<Post> {
   return data.json();
 }
 
+
 // Post details page
 export default async function PostPage({ params }: PostProps) {
-  const post = await getPostById(params.id);
-  const { id, title, body } = post;
+  const { id } = await params; // Awaiting params
+  
+  const post = await getPostById(id);
+  const { title, body } = post;
 
+  console.log("id, title, body", id, title, body);
 
   return (
     <main className="flex min-h-screen flex-col items-center p-10 mt-24">
