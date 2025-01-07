@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Post } from "../page"; 
+import { BASE_API_URL } from "../page";
 
 export const metadata: Metadata = {
   title: "Post Details",
@@ -10,18 +11,15 @@ type PostProps = {
 };
 
 // Fetch a single post by id
-async function getPostById(id: number): Promise<Post | null> {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
-  if (!res.ok) {
-    return null;
-  }
-  return res.json();
+async function getPostById(id: string): Promise<Post> {
+  const data = await fetch(`${BASE_API_URL}/posts/${id}`);
+  return data.json();
 }
 
 // Post details page
 export default async function PostPage({ params }: PostProps) {
-  const postId = parseInt(params.id, 10);
-  const post = await getPostById(postId);
+  //const postId = parseInt(params.id, 10);
+  const post = await getPostById(params.id);
 
   if (!post) {
     notFound(); // If the post doesn't exist, show a 404 page
