@@ -5,6 +5,9 @@ import { Post } from "../page";
 export const metadata: Metadata = {
   title: "Post Details",
 };
+type PostProps = {
+  params: { id: string };
+};
 
 // Fetch a single post by id
 async function getPostById(id: number): Promise<Post | null> {
@@ -16,7 +19,7 @@ async function getPostById(id: number): Promise<Post | null> {
 }
 
 // Post details page
-export default async function PostPage({ params }: { params: { id: string } }) {
+export default async function PostPage({ params }: PostProps) {
   const postId = parseInt(params.id, 10);
   const post = await getPostById(postId);
 
