@@ -18,13 +18,9 @@ async function getPostById(id: string): Promise<Post> {
 
 // Post details page
 export default async function PostPage({ params }: PostProps) {
-  //const postId = parseInt(params.id, 10);
-  const { id } = await params;
-  const post = await getPostById(id);
+  const post = await getPostById(params.id);
+  const { id, title, body } = post;
 
-  if (!post) {
-    notFound(); // If the post doesn't exist, show a 404 page
-  }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-10 mt-24">
