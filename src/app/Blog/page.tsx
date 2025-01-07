@@ -1,93 +1,132 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-import { Navigation } from "../components/Navigation";
+export type Post = {
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+};
 
-// Sample blog data
-const reviews = [
-  { title: "Inception Review", image: "inception-review.jpg", category: "Review", date: "2023-10-15", author: "John Doe" },
-  { title: "Dark Knight Review", image: "dark-knight-review.jpg", category: "Review", date: "2023-08-20", author: "Jane Smith" },
-  { title: "Interstellar: A Deep Dive", image: "interstellar-review.jpg", category: "Review", date: "2023-06-05", author: "Chris Nolan" },
-];
+type BlogPageProps = {
+  searchParams: { page: string };
+};
 
-const announcements = [
-  { title: "New Film Releases in 2024", image: "new-releases-2024.jpg", category: "Announcement", date: "2024-01-05", author: "Admin" },
-  { title: "FilmNest Updates Coming Soon", image: "updates-coming.jpg", category: "Announcement", date: "2023-12-15", author: "Team" },
-];
+type PagingInfo = {
+  _start?: number;
+  _limit?: number;
+};
 
-const interviews = [
-  { title: "Interview with the Director of Inception", image: "inception-director.jpg", category: "Interview", date: "2023-09-10", author: "Emma Watson" },
-  { title: "Stranger Things Cast Interview", image: "stranger-things-interview.jpg", category: "Interview", date: "2023-07-20", author: "David Harbour" },
-];
+type PaginationProps = {
+  currentPage: number;
+  pagesCount: number;
+};
 
-export default function Blog() {
+export const metadata: Metadata = {
+  title: "Blog",
+};
+
+export const BASE_API_URL = "https://jsonplaceholder.typicode.com";
+const PAGE_SIZE = 12;
+
+// Fetch posts for the current page
+async function getPosts({
+  _start = 0,
+  _limit = PAGE_SIZE,
+}: PagingInfo): Promise<Post[]> {
+  const res = await fetch(
+    `${BASE_API_URL}/posts?_start=${_start}&_limit=${_limit}`
+  );
+  return res.json();
+}
+
+
+// Fetch total number of posts
+async function getPostsCount(): Promise<number> {
+  const res = await fetch(`${BASE_API_URL}/posts?_limit=1`, {
+    method: "HEAD",
+  });
+  const count = res.headers.get("x-total-count");
+  return count ? parseInt(count, 10) : 0;
+}
+
+// Render individual post
+function processPost(post: Post) {
+  const { id, title } = post;
+  return (
+    <li key={id} className="mb-4">
+      <Link
+        href={`/Blog/${id}`}
+        className="block p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 transition-colors duration-200"
+      >
+        <h2 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+          Post {id}: {title}
+        </h2>
+      </Link>
+    </li>
+  );
+}
+
+// Pagination component
+function Pagination({ currentPage, pagesCount }: PaginationProps) {
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage === pagesCount;
 
   return (
-    <div className="bg-white text-black min-h-screen">
-      {/* Navigation Bar */}
-      <Navigation />
-
-      {/* Page Content */}
-      <div className="mt-32 mx-4">
-
-        {/* Reviews Section */}
-        <section className="mb-8 px-4 margin-all-12 rounded-lg shadow-lg border">
-          <h2 className="text-2xl font-bold my-4">Reviews</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
-            {reviews.map((review, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-lg border">
-                <img src={review.image} alt={review.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold mb-2">{review.title}</h3>
-                  <p className="text-sm text-gray-400">{review.category}</p>
-                  <p className="text-sm text-gray-400">Date: {review.date}</p>
-                  <p className="text-sm text-gray-400">Author: {review.author}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Announcements Section */}
-        <section className="mb-8 px-4 rounded-lg shadow-lg border">
-          <h2 className="text-2xl font-bold my-4">Announcements</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
-            {announcements.map((announcement, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-lg border">
-                <img src={announcement.image} alt={announcement.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold mb-2">{announcement.title}</h3>
-                  <p className="text-sm text-gray-400">{announcement.category}</p>
-                  <p className="text-sm text-gray-400">Date: {announcement.date}</p>
-                  <p className="text-sm text-gray-400">Author: {announcement.author}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Interviews Section */}
-        <section className="mb-8 px-4 shadow-lg rounded-lg border">
-          <h2 className="text-2xl font-bold my-4">Interviews</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
-            {interviews.map((interview, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-lg border">
-                <img src={interview.image} alt={interview.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold mb-2">{interview.title}</h3>
-                  <p className="text-sm text-gray-400">{interview.category}</p>
-                  <p className="text-sm text-gray-400">Date: {interview.date}</p>
-                  <p className="text-sm text-gray-400">Author: {interview.author}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Footer Section */}
-        <footer className="text-center text-sm text-gray-400 pb-6">
-          <p>&copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.</p>
-        </footer>
+    <div className="w-full max-w-2xl mb-6 mt-4">
+      <div className="bg-white p-4 flex justify-between items-center">
+        <Link
+          href={`/Blog?page=${currentPage - 1}`}
+          className={`px-4 py-2 rounded-md transition-colors duration-100 ${
+            isFirstPage
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+          aria-disabled={isFirstPage}
+        >
+          &lt;
+        </Link>
+        <p className="text-gray-700">
+          Page{" "}
+          <span className="font-semibold text-gray-900">{currentPage}</span> of{" "}
+          <span className="font-semibold text-gray-900">{pagesCount}</span>
+        </p>
+        <Link
+          href={`/Blog?page=${currentPage + 1}`}
+          className={`px-4 py-2 rounded-md transition-colors duration-100 ${
+            isLastPage
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+          aria-disabled={isLastPage}
+        >
+          &gt;
+        </Link>
       </div>
     </div>
+  );
+}
+
+// Main BlogPage component
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const postsCount = await getPostsCount();
+  const pagesCount = Math.ceil(postsCount / PAGE_SIZE);
+  const currentPage = Math.min(
+    /^[1-9][0-9]*$/.test(searchParams.page) ? Number(searchParams.page) : 1,
+    pagesCount
+  );
+  const _start = (currentPage - 1) * PAGE_SIZE;
+  const _limit = PAGE_SIZE;
+
+  const posts = await getPosts({ _start, _limit });
+
+  return (
+    <main className="flex min-h-screen flex-col items-center p-10 mt-24">
+      {/* Removed the <h1> title */}
+      <ul className="w-full max-w-2xl space-y-4">{posts.map(processPost)}</ul>
+
+      {/* Pagination at the bottom */}
+      <Pagination currentPage={currentPage} pagesCount={pagesCount} />
+    </main>
   );
 }
