@@ -46,8 +46,9 @@ async function getPostsCount(): Promise<number> {
   const res = await fetch(`${BASE_API_URL}/posts?_limit=1`, {
     method: "HEAD",
   });
-  const count = res.headers.get("x-total-count");
-  return count ? parseInt(count, 10) : 0;
+  let count: string | number = res.headers.get("x-total-count") || "1";
+  count = parseInt(count, 10);
+  return count;
 }
 
 // Render individual post
