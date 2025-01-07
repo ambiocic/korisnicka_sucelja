@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
 import type { Post } from "../page"; 
 import { BASE_API_URL } from "../page";
 
@@ -24,10 +23,10 @@ export default async function PostPage({ params }: PostProps) {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-10 mt-24">
-      <h1 className="text-4xl font-extrabold tracking-tight mb-6">Post {post.id}</h1>
+      <h1 className="text-4xl font-extrabold tracking-tight mb-6">Post {id}</h1>
       <div className="w-full max-w-2xl bg-white p-6 rounded-lg border border-gray-200 shadow-md">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">{post.title}</h2>
-        <p className="text-gray-700">{post.body}</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{title}</h2>
+        <p className="text-gray-700">{body}</p>
       </div>
     </main>
   );
