@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
 
+// Define the Post type
 export type Post = {
   userId: number;
   id: number;
@@ -8,8 +9,9 @@ export type Post = {
   body: string;
 };
 
+// Define the type for BlogPageProps with searchParams as a Promise
 type BlogPageProps = {
-  searchParams: { page: string };
+  searchParams: Promise<{ page: string }>;
 };
 
 type PagingInfo = {
@@ -26,7 +28,7 @@ export const metadata: Metadata = {
   title: "Blog",
 };
 
-export const BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
+// Define the page size for pagination
 const PAGE_SIZE = 12;
 
 // Fetch posts for the current page
@@ -35,20 +37,18 @@ async function getPosts({
   _limit = PAGE_SIZE,
 }: PagingInfo): Promise<Post[]> {
   const res = await fetch(
-    `${BASE_API_URL}/posts?_start=${_start}&_limit=${_limit}`
+    `${process.env.BASE_API_URL}/posts?_start=${_start}&_limit=${_limit}`
   );
   return res.json();
 }
 
-
 // Fetch total number of posts
 async function getPostsCount(): Promise<number> {
-  const res = await fetch(`${BASE_API_URL}/posts?_limit=1`, {
+  const res = await fetch(`${process.env.BASE_API_URL}/posts?_limit=1`, {
     method: "HEAD",
   });
-  let count: string | number = res.headers.get("x-total-count") || "1";
-  count = parseInt(count, 10);
-  return count;
+  const count = res.headers.get("x-total-count");
+  return count ? parseInt(count, 10) : 0;
 }
 
 // Render individual post
@@ -85,7 +85,7 @@ function Pagination({ currentPage, pagesCount }: PaginationProps) {
           }`}
           aria-disabled={isFirstPage}
         >
-          &lt;
+          
         </Link>
         <p className="text-gray-700">
           Page{" "}
@@ -101,7 +101,6 @@ function Pagination({ currentPage, pagesCount }: PaginationProps) {
           }`}
           aria-disabled={isLastPage}
         >
-          &gt;
         </Link>
       </div>
     </div>
@@ -110,8 +109,9 @@ function Pagination({ currentPage, pagesCount }: PaginationProps) {
 
 // Main BlogPage component
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const { page } = await searchParams; // Awaiting searchParams
-  
+  const resolvedSearchParams = await searchParams; // Await the promise to resolve
+  const page = resolvedSearchParams.page || "1";
+
   const postsCount = await getPostsCount();
   const pagesCount = Math.ceil(postsCount / PAGE_SIZE);
   const currentPage = Math.min(
@@ -125,7 +125,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-10 mt-24">
-      {/* Removed the <h1> title */}
       <ul className="w-full max-w-2xl space-y-4">{posts.map(processPost)}</ul>
 
       {/* Pagination at the bottom */}
