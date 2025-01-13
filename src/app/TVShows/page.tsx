@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Navigation } from "../components/Navigation";
 
 const tvShows = [
-    { title: "Breaking Bad", image: "breaking-bad.jpg", genre: "Drama", rating: 9.2, releaseYear: 2009},
-    { title: "Stranger Things", image: "stranger-things.jpg", genre: "Sci-Fi", rating: 8.8, releaseYear: 2016 },
-    { title: "The Crown", image: "the-crown.jpg", genre: "Historical", rating: 7.8, releaseYear: 2021 },
-  ];
+  { title: "Breaking Bad", image: "breaking-bad.jpg", genre: "Drama", rating: 9.2, releaseYear: 2009 },
+  { title: "Stranger Things", image: "stranger-things.jpg", genre: "Sci-Fi", rating: 8.8, releaseYear: 2016 },
+  { title: "The Crown", image: "the-crown.jpg", genre: "Historical", rating: 7.8, releaseYear: 2021 },
+];
 
 export default function TVShows() {
   const [filters, setFilters] = useState({
@@ -18,19 +18,19 @@ export default function TVShows() {
   });
 
   return (
-    <div className="bg-white text-black min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
       {/* Navigation Bar */}
       <Navigation />
 
       {/* Page Content */}
       <div className="mt-32 mx-4">
         {/* Hero Section */}
-        <div className="relative bg-cover bg-center h-64   mb-4 mx-4 mt-24">
-          <div className="absolute border rounded-lg inset-0 bg-white shadow-lg flex flex-col justify-center items-start p-6">
-            <h1 className="text-black text-3xl md:text-5xl font-extrabold mb-4">
+        <div className="relative bg-cover bg-center h-64 mb-4 mx-4 mt-24">
+          <div className="absolute border rounded-lg inset-0 bg-background shadow-lg flex flex-col justify-center items-start p-6">
+            <h1 className="text-foreground text-3xl md:text-5xl font-extrabold mb-4">
               Explore <span className="text-yellow-400">TV Shows</span>
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-500 dark:text-gray-300 text-lg">
               Filter and find your next favorite TV Show!
             </p>
           </div>
@@ -44,7 +44,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Genre</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
               >
                 <option value="All">All</option>
@@ -58,7 +58,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Rating</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
               >
                 <option value="All">All</option>
@@ -72,7 +72,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">User Rating</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, userRating: e.target.value })}
               >
                 <option value="All">All</option>
@@ -86,7 +86,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Release Year</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, releaseYear: e.target.value })}
               >
                 <option value="All">All</option>
@@ -99,14 +99,14 @@ export default function TVShows() {
           </div>
         </section>
 
-        {/* tvShowss Section */}
+        {/* TV Shows Section */}
         <section className="mb-8 px-4">
           <h2 className="text-2xl font-bold mb-4">TV Shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {tvShows.map((tvShow, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg overflow-hidden shadow-lg"
+                className="bg-background rounded-lg overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700"
               >
                 <img
                   src={tvShow.image}
@@ -115,9 +115,9 @@ export default function TVShows() {
                 />
                 <div className="p-4">
                   <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
-                  <p className="text-sm text-gray-400">{tvShow.genre}</p>
-                  <p className="text-sm text-gray-400">Rating: {tvShow.rating}</p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{tvShow.genre}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Rating: {tvShow.rating}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Release Year: {tvShow.releaseYear}
                   </p>
                 </div>
@@ -127,7 +127,7 @@ export default function TVShows() {
         </section>
 
         {/* Footer Section */}
-        <footer className="text-center text-sm text-gray-400 pb-6">
+        <footer className="text-center text-sm text-gray-500 dark:text-gray-400 pb-6">
           <p>&copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.</p>
         </footer>
       </div>

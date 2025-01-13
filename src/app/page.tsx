@@ -16,53 +16,79 @@ const tvShows = [
 
 export default function Home() {
   return (
-    <div className="bg-white text-black min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
       {/* Navigation Bar */}
       <Navigation />
 
-    <div className="mt-32 mx-4">
-      {/* Hero Section */}
-      <div className="relative bg-cover bg-center h-64   mb-4 mx-4 mt-24 " >
-        <div className="absolute border rounded-lg inset-0 bg-white shadow-lg flex flex-col justify-center items-start p-6">
-          <h1 className="text-black text-3xl md:text-5xl font-extrabold mb-4">Welcome to <span className="text-yellow-400 text-3xl md:text-5xl font-extrabold mb-4">Film</span>Nest</h1>
-          <p className="text-gray-400 font-bold text-lg">Discover your next favorite movie or TV show!</p>
+      <div className="mt-32 mx-4">
+        {/* Hero Section */}
+        <div className="relative bg-cover bg-center h-64 mb-4 mx-4 mt-24">
+          <div className="absolute border rounded-lg inset-0 bg-background shadow-lg flex flex-col justify-center items-start p-6">
+            <h1 className="text-foreground text-3xl md:text-5xl font-extrabold mb-4">
+              Welcome to{" "}
+              <span className="text-yellow-400 text-3xl md:text-5xl font-extrabold mb-4">
+                Film
+              </span>
+              Nest
+            </h1>
+            <p className="text-gray-500 dark:text-gray-300 font-bold text-lg">
+              Discover your next favorite movie or TV show!
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Recommendations Section */}
-      <section className="mb-8 px-4">
-        <h2 className="text-2xl font-bold mb-4">Recommended Movies</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {movies.map((movie, index) => (
-            <div key={index} className="bg-white rounded-lg overflow-hidden shadow-lg">
-              <img src={movie.image} alt={movie.title} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
-                <p className="text-sm text-gray-400">{movie.genre}</p>
+        {/* Recommendations Section */}
+        <section className="mb-8 px-4">
+          <h2 className="text-2xl font-bold mb-4">Recommended Movies</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {movies.map((movie, index) => (
+              <div
+                key={index}
+                className="bg-background rounded-lg overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700"
+              >
+                <img
+                  src={movie.image}
+                  alt={movie.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {movie.genre}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
 
-      {/* Trending TV Shows Section */}
-      <section className="mb-8 px-4">
-        <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {tvShows.map((show, index) => (
-            <div key={index} className="bg-white rounded-lg overflow-hidden shadow-lg">
-              <img src={show.image} alt={show.title} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <h3 className="text-lg font-bold mb-2">{show.title}</h3>
-                <p className="text-sm text-gray-400">{show.genre}</p>
+        {/* Trending TV Shows Section */}
+        <section className="mb-8 px-4">
+          <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {tvShows.map((show, index) => (
+              <div
+                key={index}
+                className="bg-background rounded-lg overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700"
+              >
+                <img
+                  src={show.image}
+                  alt={show.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-bold mb-2">{show.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {show.genre}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
       </div>
       {/* Footer Section */}
-      <footer className="text-center text-sm text-gray-400 pb-6">
+      <footer className="text-center text-sm text-gray-500 dark:text-gray-400 pb-6">
         <p>&copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.</p>
       </footer>
     </div>

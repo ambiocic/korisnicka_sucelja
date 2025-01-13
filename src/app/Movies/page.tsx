@@ -18,19 +18,19 @@ export default function Movies() {
   });
 
   return (
-    <div className="bg-white text-black min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
       {/* Navigation Bar */}
       <Navigation />
 
       {/* Page Content */}
       <div className="mt-32 mx-4">
         {/* Hero Section */}
-        <div className="relative bg-cover bg-center h-64   mb-4 mx-4 mt-24">
-          <div className="absolute border rounded-lg inset-0 bg-white shadow-lg flex flex-col justify-center items-start p-6">
-            <h1 className="text-black text-3xl md:text-5xl font-extrabold mb-4">
+        <div className="relative bg-cover bg-center h-64 mb-4 mx-4 mt-24">
+          <div className="absolute border rounded-lg inset-0 bg-background shadow-lg flex flex-col justify-center items-start p-6">
+            <h1 className="text-foreground text-3xl md:text-5xl font-extrabold mb-4">
               Explore <span className="text-yellow-400">Movies</span>
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-500 dark:text-gray-300 text-lg">
               Filter and find your next favorite movie!
             </p>
           </div>
@@ -44,7 +44,7 @@ export default function Movies() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Genre</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
               >
                 <option value="All">All</option>
@@ -58,7 +58,7 @@ export default function Movies() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Rating</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
               >
                 <option value="All">All</option>
@@ -72,7 +72,7 @@ export default function Movies() {
             <div>
               <h3 className="text-lg font-semibold mb-2">User Rating</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, userRating: e.target.value })}
               >
                 <option value="All">All</option>
@@ -86,7 +86,7 @@ export default function Movies() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Release Year</h3>
               <select
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, releaseYear: e.target.value })}
               >
                 <option value="All">All</option>
@@ -106,7 +106,7 @@ export default function Movies() {
             {movies.map((movie, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg overflow-hidden shadow-lg"
+                className="bg-background rounded-lg overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700"
               >
                 <img
                   src={movie.image}
@@ -115,9 +115,9 @@ export default function Movies() {
                 />
                 <div className="p-4">
                   <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
-                  <p className="text-sm text-gray-400">{movie.genre}</p>
-                  <p className="text-sm text-gray-400">Rating: {movie.rating}</p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{movie.genre}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Rating: {movie.rating}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Release Year: {movie.releaseYear}
                   </p>
                 </div>
@@ -127,7 +127,7 @@ export default function Movies() {
         </section>
 
         {/* Footer Section */}
-        <footer className="text-center text-sm text-gray-400 pb-6">
+        <footer className="text-center text-sm text-gray-500 dark:text-gray-400 pb-6">
           <p>&copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.</p>
         </footer>
       </div>
