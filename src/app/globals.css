@@ -28,3 +28,12 @@ a {
 a:hover {
   text-decoration: underline;
 }
+/* Skrivanje skrol bara */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* Za Internet Explorer 10+ */
+  scrollbar-width: none;      /* Za Firefox */
+}
