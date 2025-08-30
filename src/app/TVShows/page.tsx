@@ -23,6 +23,19 @@ export default function TVShows() {
     release_year: number;
   };
   const [tvShows, setTvShows] = useState<Media[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+
+   // Fetch logged-in user
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error && data?.user) {
+        setUser(data.user);
+      }
+    };
+    fetchUser();
+  }, []);
+
   useEffect(() => {
     fetchTvShows();
   }
@@ -36,6 +49,47 @@ export default function TVShows() {
     else setTvShows(data ?? []);
   };
 
+  // Add to watchlist with duplicate check
+  const addToWatchlist = async (item: Media, type: "movie" | "tv_show") => {
+    if (!user) {
+      alert("Please sign in to add to your watchlist.");
+      return;
+    }
+
+    // Check if the item is already in the watchlist
+    const { data: existingItems, error: checkError } = await supabase
+      .from("watchlist")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq(type === "movie" ? "movie_id" : "tv_show_id", item.id);
+
+    if (checkError) {
+      console.error("Error checking watchlist:", checkError);
+      alert("Failed to check watchlist. Please try again.");
+      return;
+    }
+
+    if (existingItems && existingItems.length > 0) {
+      alert(`${item.title} is already in your watchlist!`);
+      return;
+    }
+
+    // If not a duplicate, insert the item
+    const { error } = await supabase.from("watchlist").insert([
+      {
+        user_id: user.id,
+        movie_id: type === "movie" ? item.id : null,
+        tv_show_id: type === "tv_show" ? item.id : null,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error adding to watchlist:", error);
+      alert("Failed to add item to watchlist.");
+    } else {
+      alert(`${item.title} added to your watchlist!`);
+    }
+  };
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -121,35 +175,39 @@ export default function TVShows() {
 
         {/* TV Shows Section */}
         <section className="mb-8 px-4">
-          <h2 className="text-2xl font-bold mb-4">TV Shows</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tvShows.map((tvShow) => (
-                <div
-                key={tvShow.id}
-                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105"
-                >
-                <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden rounded-t-xl shadow-md">
-                  <Image
-                    src={tvShow.image}
-                    alt={tvShow.title}
-                    width={400}
-                    height={533}
-                    style={{ objectFit: "cover" }}
-                    className="w-full h-full rounded-t-xl transition-transform duration-300 hover:scale-105"
-                    unoptimized
-                  />
-                </div>
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Release Year: {tvShow.release_year}
-                  </p>
-                </div>
-                </div>
-            ))}
-          </div>
-        </section>
+                  <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {tvShows.map((tvShow) => (
+                      <div
+                        key={tvShow.id}
+                        className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
+                      >
+                        <div className="relative w-full aspect-[3/4]">
+                          <Image
+                            src={tvShow.image}
+                            alt={tvShow.title}
+                            width={300}
+                            height={400}
+                            style={{ objectFit: "cover" }}
+                            className="w-full h-full"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {tvShow.release_year}</p>
+                          <button
+                            onClick={() => addToWatchlist(tvShow, "tv_show")}
+                            className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500"
+                          >
+                            Add to Watchlist
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
 
         {/* Footer Section */}
        {/* Footer */}
