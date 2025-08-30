@@ -6,6 +6,7 @@ import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram, FaLinkedi
 import { Logo } from "./components/Logo";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
+import { User } from "@supabase/supabase-js";
 
 export default function Home() {
   type Media = {
@@ -18,8 +19,7 @@ export default function Home() {
 
   const [movies, setMovies] = useState<Media[]>([]);
   const [tvShows, setTvShows] = useState<Media[]>([]);
-  const [watchlist, setWatchlist] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   // Fetch logged-in user
   useEffect(() => {
@@ -54,36 +54,32 @@ export default function Home() {
     }
   };
 
-  // Fetch watchlist (koristimo alias da ne bude konflikt)
-  const fetchWatchlist = async () => {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("watchlist")
-      .select(`
-        id,
-        movie_id,
-        tv_show_id,
-        movie:movies(id, title, image, genre, release_year),
-        tv_show:tv_shows(id, title, image, genre, release_year)
-      `)
-      .eq("user_id", user.id)
-      .order("id", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching watchlist:", error);
-    } else {
-      setWatchlist(data);
-    }
-  };
-
-  // Add to watchlist
+  // Add to watchlist with duplicate check
   const addToWatchlist = async (item: Media, type: "movie" | "tv_show") => {
     if (!user) {
       alert("Please sign in to add to your watchlist.");
       return;
     }
 
+    // Check if the item is already in the watchlist
+    const { data: existingItems, error: checkError } = await supabase
+      .from("watchlist")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq(type === "movie" ? "movie_id" : "tv_show_id", item.id);
+
+    if (checkError) {
+      console.error("Error checking watchlist:", checkError);
+      alert("Failed to check watchlist. Please try again.");
+      return;
+    }
+
+    if (existingItems && existingItems.length > 0) {
+      alert(`${item.title} is already in your watchlist!`);
+      return;
+    }
+
+    // If not a duplicate, insert the item
     const { error } = await supabase.from("watchlist").insert([
       {
         user_id: user.id,
@@ -94,18 +90,9 @@ export default function Home() {
 
     if (error) {
       console.error("Error adding to watchlist:", error);
+      alert("Failed to add item to watchlist.");
     } else {
-      fetchWatchlist();
-    }
-  };
-
-  // Remove from watchlist
-  const removeFromWatchlist = async (id: number) => {
-    const { error } = await supabase.from("watchlist").delete().eq("id", id);
-    if (error) {
-      console.error("Error removing from watchlist:", error);
-    } else {
-      fetchWatchlist();
+      alert(`${item.title} added to your watchlist!`);
     }
   };
 
@@ -113,10 +100,6 @@ export default function Home() {
     fetchMovies();
     fetchTvShows();
   }, []);
-
-  useEffect(() => {
-    if (user) fetchWatchlist();
-  }, [user]);
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -146,14 +129,14 @@ export default function Home() {
             {movies.map((movie) => (
               <div
                 key={movie.id}
-                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105"
+                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
               >
                 <div className="relative w-full aspect-[3/4]">
                   <Image
                     src={movie.image}
                     alt={movie.title}
-                    width={400}
-                    height={533}
+                    width={300}
+                    height={400}
                     style={{ objectFit: "cover" }}
                     className="w-full h-full"
                     unoptimized
@@ -182,14 +165,14 @@ export default function Home() {
             {tvShows.map((tvShow) => (
               <div
                 key={tvShow.id}
-                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105"
+                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
               >
                 <div className="relative w-full aspect-[3/4]">
                   <Image
                     src={tvShow.image}
                     alt={tvShow.title}
-                    width={400}
-                    height={533}
+                    width={300}
+                    height={400}
                     style={{ objectFit: "cover" }}
                     className="w-full h-full"
                     unoptimized
@@ -210,61 +193,6 @@ export default function Home() {
             ))}
           </div>
         </section>
-
-        {/* Your Watchlist */}
-        <section className="mb-8 px-4">
-          <h2 className="text-2xl font-bold mb-4">Your Watchlist</h2>
-          {!user ? (
-            <div className="bg-background rounded-lg shadow-lg border border-gray-300 dark:border-gray-700 p-6 text-center">
-              <p className="text-gray-500 dark:text-gray-300 font-bold text-lg mb-4">
-                Sign in to access your Watchlist
-              </p>
-              <a
-                href="/Account"
-                className="bg-yellow-400 text-white font-bold py-2 px-4 rounded inline-block"
-              >
-                Sign In / Register
-              </a>
-            </div>
-          ) : watchlist.length === 0 ? (
-            <p className="text-center text-gray-500">Your watchlist is empty.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {watchlist.map((item) => {
-                const media = item.movie ?? item.tv_show;
-                if (!media) return null;
-                return (
-                  <div
-                    key={item.id}
-                    className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col"
-                  >
-                    <div className="relative w-full aspect-[3/4]">
-                      <Image
-                        src={media.image}
-                        alt={media.title}
-                        width={400}
-                        height={533}
-                        style={{ objectFit: "cover" }}
-                        className="w-full h-full"
-                        unoptimized
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold mb-2">{media.title}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{media.genre}</p>
-                      <button
-                        onClick={() => removeFromWatchlist(item.id)}
-                        className="mt-3 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
       </div>
 
       {/* Footer */}
@@ -276,11 +204,31 @@ export default function Home() {
           <div className="text-center md:text-left">
             <h3 className="text-lg font-bold mb-4">Sitemap</h3>
             <ul>
-              <li className="mb-2">Movies</li>
-              <li className="mb-2">TV Shows</li>
-              <li className="mb-2">Blog</li>
-              <li className="mb-2">Account</li>
-              <li className="mb-2">About Us</li>
+              <li className="mb-2">
+                <a href="/Movies" className="hover:text-yellow-400">
+                  Movies
+                </a>
+              </li>
+              <li className="mb-2">
+                <a href="/TVShows" className="hover:text-yellow-400">
+                  TV Shows
+                </a>
+              </li>
+              <li className="mb-2">
+                <a href="/Blog" className="hover:text-yellow-400">
+                  Blog
+                </a>
+              </li>
+              <li className="mb-2">
+                <a href="/Account" className="hover:text-yellow-400">
+                  Account
+                </a>
+              </li>
+              <li className="mb-2">
+                <a href="/AboutUs" className="hover:text-yellow-400">
+                  About Us
+                </a>
+              </li>
             </ul>
           </div>
           <div className="text-center md:text-left">
@@ -295,10 +243,18 @@ export default function Home() {
               <FaEnvelope className="mr-2" /> filmnest@fesb.hr
             </p>
             <div className="flex space-x-4 justify-center md:justify-start mt-4">
-              <FaFacebook size={24} className="text-white hover:text-yellow-400" />
-              <FaTwitter size={24} className="text-white hover:text-yellow-400" />
-              <FaInstagram size={24} className="text-white hover:text-yellow-400" />
-              <FaLinkedin size={24} className="text-white hover:text-yellow-400" />
+              <a href="#" className="text-white hover:text-yellow-400">
+                <FaFacebook size={24} />
+              </a>
+              <a href="#" className="text-white hover:text-yellow-400">
+                <FaTwitter size={24} />
+              </a>
+              <a href="#" className="text-white hover:text-yellow-400">
+                <FaInstagram size={24} />
+              </a>
+              <a href="#" className="text-white hover:text-yellow-400">
+                <FaLinkedin size={24} />
+              </a>
             </div>
           </div>
         </div>
