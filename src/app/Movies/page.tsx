@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Navigation } from "../components/Navigation";
-
-const movies = [
-  { title: "Inception", image: "inception.jpg", genre: "Sci-Fi", rating: 8.8, releaseYear: 2010 },
-  { title: "The Dark Knight", image: "dark-knight.jpg", genre: "Action", rating: 9.0, releaseYear: 2008 },
-  { title: "Interstellar", image: "interstellar.jpg", genre: "Sci-Fi", rating: 8.6, releaseYear: 2014 },
-];
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Movies() {
   const [filters, setFilters] = useState({
@@ -16,6 +12,31 @@ export default function Movies() {
     userRating: "All",
     releaseYear: "All",
   });
+
+type Media = {
+    id: number;
+    title: string;
+    image: string;
+    genre: string;
+    release_year: number;
+  };
+
+  const [movies, setMovies] = useState<Media[]>([]);
+  
+  useEffect(() => {
+    fetchMovies();
+  }, []);
+
+  const fetchMovies = async () => {
+    const { data, error } = await supabase
+      .from('movies')
+      .select('*')
+      .limit(10);
+    if (error) console.log('Error fetching movies:', error);
+    else setMovies(data ?? []);
+  };
+
+
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -99,29 +120,34 @@ export default function Movies() {
           </div>
         </section>
 
-        {/* Movies Section */}
+      {/* Movies Section */}
         <section className="mb-8 px-4">
-          <h2 className="text-2xl font-bold mb-4">Movies</h2>
+          <h2 className="text-2xl font-bold mb-4">TV Shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {movies.map((movie, index) => (
-              <div
-                key={index}
-                className="bg-background rounded-lg overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700"
-              >
-                <img
-                  src={movie.image}
-                  alt={movie.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
+            {movies.map((movie) => (
+                <div
+                key={movie.id}
+                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105"
+                >
+                <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden rounded-t-xl shadow-md">
+                  <Image
+                    src={movie.image}
+                    alt={movie.title}
+                    width={400}
+                    height={533}
+                    style={{ objectFit: "cover" }}
+                    className="w-full h-full rounded-t-xl transition-transform duration-300 hover:scale-105"
+                    unoptimized
+                  />
+                </div>
+                <div className="p-4 flex-1 flex flex-col justify-between">
                   <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{movie.genre}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Rating: {movie.rating}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{movie.genre}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Release Year: {movie.releaseYear}
+                  Release Year: {movie.release_year}
                   </p>
                 </div>
-              </div>
+                </div>
             ))}
           </div>
         </section>

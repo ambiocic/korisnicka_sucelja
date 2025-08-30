@@ -1,0 +1,19 @@
+const movies = [
+  { title: "Inception", image: "inception.jpg", genre: "Sci-Fi" },
+  { title: "The Dark Knight", image: "dark-knight.jpg", genre: "Action" },
+  { title: "Interstellar", image: "interstellar.jpg", genre: "Sci-Fi" },
+  { title: "The Matrix", image: "the-matrix.jpg", genre: "Action" },
+  { title: "Avatar", image: "avatar.jpg", genre: "Adventure" },
+  { title: "The Prestige", image: "the-prestige.jpg", genre: "Drama" },
+  { title: "Shutter Island", image: "shutter-island.jpg", genre: "Thriller" },
+];
+
+const tvShows = [
+  { title: "Breaking Bad", image: "breaking-bad.jpg", genre: "Drama" },
+  { title: "Stranger Things", image: "stranger-things.jpg", genre: "Sci-Fi" },
+  { title: "The Crown", image: "the-crown.jpg", genre: "Historical" },
+  { title: "Money Heist", image: "money-heist.jpg", genre: "Thriller" },
+  { title: "The Witcher", image: "the-witcher.jpg", genre: "Fantasy" },
+  { title: "Narcos", image: "narcos.jpg", genre: "Crime" },
+  { title: "Black Mirror", image: "black-mirror.jpg", genre: "Sci-Fi" },
+];

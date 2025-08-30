@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Navigation } from "../components/Navigation";
-
-const tvShows = [
-  { title: "Breaking Bad", image: "breaking-bad.jpg", genre: "Drama", rating: 9.2, releaseYear: 2009 },
-  { title: "Stranger Things", image: "stranger-things.jpg", genre: "Sci-Fi", rating: 8.8, releaseYear: 2016 },
-  { title: "The Crown", image: "the-crown.jpg", genre: "Historical", rating: 7.8, releaseYear: 2021 },
-];
+import { supabase } from "@/lib/supabaseClient";
 
 export default function TVShows() {
   const [filters, setFilters] = useState({
@@ -16,6 +12,28 @@ export default function TVShows() {
     userRating: "All",
     releaseYear: "All",
   });
+
+  type Media = {
+    id: number;
+    title: string;
+    image: string;
+    genre: string;
+    release_year: number;
+  };
+  const [tvShows, setTvShows] = useState<Media[]>([]);
+  useEffect(() => {
+    fetchTvShows();
+  }
+, []);
+  const fetchTvShows = async () => {
+    const { data, error } = await supabase
+      .from('tv_shows')
+      .select('*')
+      .limit(10);
+    if (error) console.log('Error fetching TV shows:', error);
+    else setTvShows(data ?? []);
+  };
+
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -103,25 +121,30 @@ export default function TVShows() {
         <section className="mb-8 px-4">
           <h2 className="text-2xl font-bold mb-4">TV Shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tvShows.map((tvShow, index) => (
-              <div
-                key={index}
-                className="bg-background rounded-lg overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700"
-              >
-                <img
-                  src={tvShow.image}
-                  alt={tvShow.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
+            {tvShows.map((tvShow) => (
+                <div
+                key={tvShow.id}
+                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105"
+                >
+                <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden rounded-t-xl shadow-md">
+                  <Image
+                    src={tvShow.image}
+                    alt={tvShow.title}
+                    width={400}
+                    height={533}
+                    style={{ objectFit: "cover" }}
+                    className="w-full h-full rounded-t-xl transition-transform duration-300 hover:scale-105"
+                    unoptimized
+                  />
+                </div>
+                <div className="p-4 flex-1 flex flex-col justify-between">
                   <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{tvShow.genre}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Rating: {tvShow.rating}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Release Year: {tvShow.releaseYear}
+                  Release Year: {tvShow.release_year}
                   </p>
                 </div>
-              </div>
+                </div>
             ))}
           </div>
         </section>
