@@ -43,7 +43,6 @@ export function Navigation() {
     { title: "FilmNest", path: "/", icon: null },
     { title: "Movies", path: "/Movies", icon: <FaFilm /> },
     { title: "TV Shows", path: "/TVShows", icon: <FaTv /> },
-    { title: "Blog", path: "/Blog", icon: <FaRegNewspaper /> },
     user
       ? { title: "Your Account", path: "/Account/dashboard", icon: <FaUserAlt /> }
       : { title: "Log In / Register", path: "/Account", icon: <FaUserAlt /> },

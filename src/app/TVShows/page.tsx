@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Navigation } from "../components/Navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { User } from "@supabase/supabase-js";
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { Logo } from "@/app/components/Logo";
+import Link from "next/link";
 
 export default function TVShows() {
   const [filters, setFilters] = useState({
@@ -22,10 +24,11 @@ export default function TVShows() {
     genre: string;
     release_year: number;
   };
+
   const [tvShows, setTvShows] = useState<Media[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
-   // Fetch logged-in user
+  // Fetch logged-in user
   useEffect(() => {
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -36,17 +39,38 @@ export default function TVShows() {
     fetchUser();
   }, []);
 
+  // Fetch TV shows with filters
   useEffect(() => {
     fetchTvShows();
-  }
-, []);
+  }, [filters]);
+
   const fetchTvShows = async () => {
-    const { data, error } = await supabase
-      .from('tv_shows')
-      .select('*')
+    let query = supabase
+      .from("tv_shows")
+      .select("id, title, image, genre, release_year")
       .limit(10);
-    if (error) console.log('Error fetching TV shows:', error);
-    else setTvShows(data ?? []);
+
+    // Apply genre filter
+    if (filters.genre !== "All") {
+      query = query.eq("genre", filters.genre);
+    }
+
+    // Apply release year filter
+    if (filters.releaseYear !== "All") {
+      const decadeStart = parseInt(filters.releaseYear.replace("s", ""));
+      query = query
+        .gte("release_year", decadeStart)
+        .lte("release_year", decadeStart + 9);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching TV shows:", error);
+      alert("Failed to fetch TV shows: " + (error.message || "Unknown error"));
+    } else {
+      setTvShows(data ?? []);
+    }
   };
 
   // Add to watchlist with duplicate check
@@ -175,108 +199,106 @@ export default function TVShows() {
 
         {/* TV Shows Section */}
         <section className="mb-8 px-4">
-                  <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {tvShows.map((tvShow) => (
-                      <div
-                        key={tvShow.id}
-                        className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
-                      >
-                        <div className="relative w-full aspect-[3/4]">
-                          <Image
-                            src={tvShow.image}
-                            alt={tvShow.title}
-                            width={300}
-                            height={400}
-                            style={{ objectFit: "cover" }}
-                            className="w-full h-full"
-                            unoptimized
-                          />
-                        </div>
-                        <div className="p-4 flex-1 flex flex-col justify-between">
-                          <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {tvShow.release_year}</p>
-                          <button
-                            onClick={() => addToWatchlist(tvShow, "tv_show")}
-                            className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500"
-                          >
-                            Add to Watchlist
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+          <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {tvShows.map((tvShow) => (
+              <div
+                key={tvShow.id}
+                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
+              >
+                <Link href={`/TVShows/${tvShow.id}`}>
+                  <div className="relative w-full aspect-[3/4]">
+                    <Image
+                      src={tvShow.image}
+                      alt={tvShow.title}
+                      width={300}
+                      height={400}
+                      style={{ objectFit: "cover" }}
+                      className="w-full h-full"
+                      unoptimized
+                    />
                   </div>
-                </section>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {tvShow.release_year}</p>
+                  </div>
+                </Link>
+                <div className="p-4">
+                  <button
+                    onClick={() => addToWatchlist(tvShow, "tv_show")}
+                    className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500 w-full"
+                  >
+                    Add to Watchlist
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Footer Section */}
-       {/* Footer */}
-             <footer className="bg-gray-800 text-white py-8">
-               <div className="container mx-auto flex flex-col md:flex-row justify-center md:justify-around items-center gap-8">
-                 <div className="flex items-center h-full">
-                   <Logo />
-                 </div>
-                 <div className="text-center md:text-left">
-                   <h3 className="text-lg font-bold mb-4">Sitemap</h3>
-                   <ul>
-                     <li className="mb-2">
-                       <a href="/Movies" className="hover:text-yellow-400">
-                         Movies
-                       </a>
-                     </li>
-                     <li className="mb-2">
-                       <a href="/TVShows" className="hover:text-yellow-400">
-                         TV Shows
-                       </a>
-                     </li>
-                     <li className="mb-2">
-                       <a href="/Blog" className="hover:text-yellow-400">
-                         Blog
-                       </a>
-                     </li>
-                     <li className="mb-2">
-                       <a href="/Account" className="hover:text-yellow-400">
-                         Account
-                       </a>
-                     </li>
-                     <li className="mb-2">
-                       <a href="/AboutUs" className="hover:text-yellow-400">
-                         About Us
-                       </a>
-                     </li>
-                   </ul>
-                 </div>
-                 <div className="text-center md:text-left">
-                   <h3 className="text-lg font-bold mb-4">Contact Us</h3>
-                   <p className="flex items-center justify-center md:justify-start mb-2">
-                     <FaMapMarkerAlt className="mr-2" /> Ruđera Boškovića 32, 21000 Split, Hrvatska
-                   </p>
-                   <p className="flex items-center justify-center md:justify-start mb-2">
-                     <FaPhone className="mr-2" /> +385 000 000
-                   </p>
-                   <p className="flex items-center justify-center md:justify-start mb-2">
-                     <FaEnvelope className="mr-2" /> filmnest@fesb.hr
-                   </p>
-                   <div className="flex space-x-4 justify-center md:justify-start mt-4">
-                     <a href="#" className="text-white hover:text-yellow-400">
-                       <FaFacebook size={24} />
-                     </a>
-                     <a href="#" className="text-white hover:text-yellow-400">
-                       <FaTwitter size={24} />
-                     </a>
-                     <a href="#" className="text-white hover:text-yellow-400">
-                       <FaInstagram size={24} />
-                     </a>
-                     <a href="#" className="text-white hover:text-yellow-400">
-                       <FaLinkedin size={24} />
-                     </a>
-                   </div>
-                 </div>
-               </div>
-               <p className="text-center text-sm mt-8">
-                 &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
-               </p>
-             </footer>
+        <footer className="bg-gray-800 text-white py-8">
+          <div className="container mx-auto flex flex-col md:flex-row justify-center md:justify-around items-center gap-8">
+            <div className="flex items-center h-full">
+              <Logo />
+            </div>
+            <div className="text-center md:text-left">
+              <h3 className="text-lg font-bold mb-4">Sitemap</h3>
+              <ul>
+                <li className="mb-2">
+                  <a href="/Movies" className="hover:text-yellow-400">
+                    Movies
+                  </a>
+                </li>
+                <li className="mb-2">
+                  <a href="/TVShows" className="hover:text-yellow-400">
+                    TV Shows
+                  </a>
+                </li>
+                <li className="mb-2">
+                  <a href="/Account" className="hover:text-yellow-400">
+                    Account
+                  </a>
+                </li>
+                <li className="mb-2">
+                  <a href="/AboutUs" className="hover:text-yellow-400">
+                    About Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="text-center md:text-left">
+              <h3 className="text-lg font-bold mb-4">Contact Us</h3>
+              <p className="flex items-center justify-center md:justify-start mb-2">
+                <FaMapMarkerAlt className="mr-2" /> Ruđera Boškovića 32, 21000 Split, Hrvatska
+              </p>
+              <p className="flex items-center justify-center md:justify-start mb-2">
+                <FaPhone className="mr-2" /> +385 000 000
+              </p>
+              <p className="flex items-center justify-center md:justify-start mb-2">
+                <FaEnvelope className="mr-2" /> filmnest@fesb.hr
+              </p>
+              <div className="flex space-x-4 justify-center md:justify-start mt-4">
+                <a href="#" className="text-white hover:text-yellow-400">
+                  <FaFacebook size={24} />
+                </a>
+                <a href="#" className="text-white hover:text-yellow-400">
+                  <FaTwitter size={24} />
+                </a>
+                <a href="#" className="text-white hover:text-yellow-400">
+                  <FaInstagram size={24} />
+                </a>
+                <a href="#" className="text-white hover:text-yellow-400">
+                  <FaLinkedin size={24} />
+                </a>
+              </div>
+            </div>
+          </div>
+          <p className="text-center text-sm mt-8">
+            &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );

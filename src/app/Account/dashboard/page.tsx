@@ -255,11 +255,7 @@ export default function Dashboard() {
                   TV Shows
                 </a>
               </li>
-              <li className="mb-2">
-                <a href="/Blog" className="hover:text-yellow-400">
-                  Blog
-                </a>
-              </li>
+         
               <li className="mb-2">
                 <a href="/Account" className="hover:text-yellow-400">
                   Account

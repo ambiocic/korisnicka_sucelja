@@ -7,6 +7,7 @@ import { Logo } from "./components/Logo";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import { User } from "@supabase/supabase-js";
+import Link from "next/link";
 
 export default function Home() {
   type Media = {
@@ -34,9 +35,10 @@ export default function Home() {
 
   // Fetch movies
   const fetchMovies = async () => {
-    const { data, error } = await supabase.from("movies").select("*");
+    const { data, error } = await supabase.from("movies").select("id, title, image, genre, release_year");
     if (error) {
-      console.log("Error fetching movies:", error);
+      console.error("Error fetching movies:", error);
+      alert("Failed to fetch movies: " + (error.message || "Unknown error"));
     } else if (data) {
       const shuffled = data.sort(() => 0.5 - Math.random());
       setMovies(shuffled.slice(0, 3));
@@ -45,9 +47,10 @@ export default function Home() {
 
   // Fetch TV shows
   const fetchTvShows = async () => {
-    const { data, error } = await supabase.from("tv_shows").select("*");
+    const { data, error } = await supabase.from("tv_shows").select("id, title, image, genre, release_year");
     if (error) {
-      console.log("Error fetching TV shows:", error);
+      console.error("Error fetching TV shows:", error);
+      alert("Failed to fetch TV shows: " + (error.message || "Unknown error"));
     } else if (data) {
       const shuffled = data.sort(() => 0.5 - Math.random());
       setTvShows(shuffled.slice(0, 3));
@@ -131,24 +134,28 @@ export default function Home() {
                 key={movie.id}
                 className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
               >
-                <div className="relative w-full aspect-[3/4]">
-                  <Image
-                    src={movie.image}
-                    alt={movie.title}
-                    width={300}
-                    height={400}
-                    style={{ objectFit: "cover" }}
-                    className="w-full h-full"
-                    unoptimized
-                  />
-                </div>
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{movie.genre}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {movie.release_year}</p>
+                <Link href={`/Movies/${movie.id}`}>
+                  <div className="relative w-full aspect-[3/4]">
+                    <Image
+                      src={movie.image}
+                      alt={movie.title}
+                      width={300}
+                      height={400}
+                      style={{ objectFit: "cover" }}
+                      className="w-full h-full"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{movie.genre}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {movie.release_year}</p>
+                  </div>
+                </Link>
+                <div className="p-4">
                   <button
                     onClick={() => addToWatchlist(movie, "movie")}
-                    className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500"
+                    className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500 w-full"
                   >
                     Add to Watchlist
                   </button>
@@ -167,24 +174,28 @@ export default function Home() {
                 key={tvShow.id}
                 className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
               >
-                <div className="relative w-full aspect-[3/4]">
-                  <Image
-                    src={tvShow.image}
-                    alt={tvShow.title}
-                    width={300}
-                    height={400}
-                    style={{ objectFit: "cover" }}
-                    className="w-full h-full"
-                    unoptimized
-                  />
-                </div>
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {tvShow.release_year}</p>
+                <Link href={`/TVShows/${tvShow.id}`}>
+                  <div className="relative w-full aspect-[3/4]">
+                    <Image
+                      src={tvShow.image}
+                      alt={tvShow.title}
+                      width={300}
+                      height={400}
+                      style={{ objectFit: "cover" }}
+                      className="w-full h-full"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {tvShow.release_year}</p>
+                  </div>
+                </Link>
+                <div className="p-4">
                   <button
                     onClick={() => addToWatchlist(tvShow, "tv_show")}
-                    className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500"
+                    className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500 w-full"
                   >
                     Add to Watchlist
                   </button>
