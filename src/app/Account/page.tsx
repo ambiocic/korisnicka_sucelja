@@ -1,32 +1,88 @@
-"use client";
+'use client';
 
-import { Navigation } from "../components/Navigation";  // Assuming the Navigation component is already created
+import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
-export default function SignInRegister() {
+export default function AccountPage() {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (activeTab === 'login') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return setError(error.message);
+      router.push('/Account/dashboard');
+    } else {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) return setError(error.message);
+      alert('Provjeri email za potvrdu registracije!');
+      setActiveTab('login');
+      router.push('/Account/dashboard');
+    }
+  };
+
   return (
-    <div className="bg-background dark:bg-gray-900 text-foreground dark:text-white min-h-screen flex flex-col">
-      {/* Navigation Bar */}
-      <Navigation />
-
-      {/* Page Content */}
-      <div className="flex flex-grow justify-center items-center mt-32 mx-4">
-        {/* Form Section */}
-        <div className="w-full max-w-md">
-          <div className="flex justify-center mb-6 rounded-lg">
-            <button className="w-1/2 py-2 font-semibold text-lg shadow-lg rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-yellow-400 dark:hover:bg-yellow-400 hover:text-gray-900 dark:hover:text-black transition-colors">
-              Sign In
-            </button>
-            <button className="w-1/2 py-2 font-semibold text-lg shadow-lg rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-yellow-500 dark:hover:bg-yellow-500 hover:text-gray-900 dark:hover:text-black transition-colors">
-              Register
-            </button>
-          </div>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-md rounded-xl p-6 w-96">
+        <div className="flex justify-between mb-4">
+          <button
+            onClick={() => setActiveTab('login')}
+            className={`px-4 py-2 rounded-t-lg ${activeTab === 'login' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          >
+            Login
+          </button>
+          <button
+            onClick={() => setActiveTab('register')}
+            className={`px-4 py-2 rounded-t-lg ${activeTab === 'register' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          >
+            Register
+          </button>
         </div>
-      </div>
 
-      {/* Footer Section */}
-      <footer className="text-center text-sm text-gray-400 dark:text-gray-500 pb-6">
-        <p>&copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.</p>
-      </footer>
+        <form onSubmit={handleSubmit}>
+          {error && <p className="text-red-500 mb-2">{error}</p>}
+          <input
+            type="email"
+            placeholder="Email"
+            className="border p-2 w-full mb-3 rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Lozinka"
+            className="border p-2 w-full mb-3 rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Potvrdi lozinku"
+            className="border p-2 w-full mb-3 rounded"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required={activeTab === 'register'}
+            style={{ display: activeTab === 'register' ? 'block' : 'none' }}
+            disabled={activeTab === 'login'}
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded w-full hover:bg-blue-700"
+          >
+            {activeTab === 'login' ? 'Log in' : 'Register'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

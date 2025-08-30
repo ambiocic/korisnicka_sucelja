@@ -107,9 +107,9 @@ export default function Home() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               Save shows and movies to keep track of what you want to watch.
             </p>
-            <button className="bg-yellow-400 text-white font-bold py-2 px-4 rounded">
-              Sign In
-            </button>
+            <a href="/Account" className="bg-yellow-400 text-white font-bold py-2 px-4 rounded inline-block">
+              Sign In / Register
+            </a>
           </div>
         </section>
       </div>
