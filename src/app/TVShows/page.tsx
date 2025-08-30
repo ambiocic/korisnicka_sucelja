@@ -124,7 +124,7 @@ export default function TVShows() {
       <div className="mt-32 mx-4">
         {/* Hero Section */}
         <div className="relative bg-cover bg-center h-64 mb-4 mx-4 mt-24">
-          <div className="absolute border rounded-lg inset-0 bg-background shadow-lg flex flex-col justify-center items-start p-6">
+          <div className="absolute  rounded-lg inset-0 bg-background shadow-lg flex flex-col justify-center items-start p-6">
             <h1 className="text-foreground text-3xl md:text-5xl font-extrabold mb-4">
               Explore <span className="text-yellow-400">TV Shows</span>
             </h1>
@@ -142,7 +142,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Genre</h3>
               <select
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
+                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
               >
                 <option value="All">All</option>
@@ -156,7 +156,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Rating</h3>
               <select
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
+                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
               >
                 <option value="All">All</option>
@@ -170,7 +170,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">User Rating</h3>
               <select
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
+                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, userRating: e.target.value })}
               >
                 <option value="All">All</option>
@@ -184,7 +184,7 @@ export default function TVShows() {
             <div>
               <h3 className="text-lg font-semibold mb-2">Release Year</h3>
               <select
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-background text-foreground"
+                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
                 onChange={(e) => setFilters({ ...filters, releaseYear: e.target.value })}
               >
                 <option value="All">All</option>
@@ -204,7 +204,7 @@ export default function TVShows() {
             {tvShows.map((tvShow) => (
               <div
                 key={tvShow.id}
-                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
+                className="bg-background rounded-xl overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
               >
                 <Link href={`/TVShows/${tvShow.id}`}>
                   <div className="relative w-full aspect-[3/4]">
@@ -238,67 +238,68 @@ export default function TVShows() {
         </section>
 
         {/* Footer Section */}
-        <footer className="bg-gray-800 text-white py-8">
-          <div className="container mx-auto flex flex-col md:flex-row justify-center md:justify-around items-center gap-8">
-            <div className="flex items-center h-full">
-              <Logo />
-            </div>
-            <div className="text-center md:text-left">
-              <h3 className="text-lg font-bold mb-4">Sitemap</h3>
-              <ul>
-                <li className="mb-2">
-                  <a href="/Movies" className="hover:text-yellow-400">
-                    Movies
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="/TVShows" className="hover:text-yellow-400">
-                    TV Shows
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="/Account" className="hover:text-yellow-400">
-                    Account
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="/AboutUs" className="hover:text-yellow-400">
-                    About Us
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="text-center md:text-left">
-              <h3 className="text-lg font-bold mb-4">Contact Us</h3>
-              <p className="flex items-center justify-center md:justify-start mb-2">
-                <FaMapMarkerAlt className="mr-2" /> Ruđera Boškovića 32, 21000 Split, Hrvatska
-              </p>
-              <p className="flex items-center justify-center md:justify-start mb-2">
-                <FaPhone className="mr-2" /> +385 000 000
-              </p>
-              <p className="flex items-center justify-center md:justify-start mb-2">
-                <FaEnvelope className="mr-2" /> filmnest@fesb.hr
-              </p>
-              <div className="flex space-x-4 justify-center md:justify-start mt-4">
-                <a href="#" className="text-white hover:text-yellow-400">
-                  <FaFacebook size={24} />
+         {/* Footer */}
+      <footer className="bg-gray-800 dark:bg-gray-900 text-foreground py-8 mt-auto">
+        <div className="container mx-auto flex flex-col md:flex-row justify-center md:justify-around items-center gap-8">
+          <div className="flex items-center h-full">
+            <Logo />
+          </div>
+          <div className="text-center md:text-left">
+            <h3 className="text-lg font-extrabold mb-4">Sitemap</h3>
+            <ul>
+              <li className="mb-2">
+                <a href="/Movies" className="hover:text-yellow-400">
+                  Movies
                 </a>
-                <a href="#" className="text-white hover:text-yellow-400">
-                  <FaTwitter size={24} />
+              </li>
+              <li className="mb-2">
+                <a href="/TVShows" className="hover:text-yellow-400">
+                  TV Shows
                 </a>
-                <a href="#" className="text-white hover:text-yellow-400">
-                  <FaInstagram size={24} />
+              </li>
+              <li className="mb-2">
+                <a href="/Account" className="hover:text-yellow-400">
+                  Account
                 </a>
-                <a href="#" className="text-white hover:text-yellow-400">
-                  <FaLinkedin size={24} />
+              </li>
+              <li className="mb-2">
+                <a href="/AboutUs" className="hover:text-yellow-400">
+                  About Us
                 </a>
-              </div>
+              </li>
+            </ul>
+          </div>
+          <div className="text-center md:text-left">
+            <h3 className="text-lg font-extrabold mb-4">Contact Us</h3>
+            <p className="flex items-center justify-center md:justify-start mb-2">
+              <FaMapMarkerAlt className="mr-2" /> Ruđera Boškovića 32, 21000 Split, Croatia
+            </p>
+            <p className="flex items-center justify-center md:justify-start mb-2">
+              <FaPhone className="mr-2" /> +385 000 000
+            </p>
+            <p className="flex items-center justify-center md:justify-start mb-2">
+              <FaEnvelope className="mr-2" /> filmnest@fesb.hr
+            </p>
+            <div className="flex space-x-4 justify-center md:justify-start mt-4">
+              <a href="#" className="text-foreground hover:text-yellow-400">
+                <FaFacebook size={24} />
+              </a>
+              <a href="#" className="text-foreground hover:text-yellow-400">
+                <FaTwitter size={24} />
+              </a>
+              <a href="#" className="text-foreground hover:text-yellow-400">
+                <FaInstagram size={24} />
+              </a>
+              <a href="#" className="text-foreground hover:text-yellow-400">
+                <FaLinkedin size={24} />
+              </a>
             </div>
           </div>
-          <p className="text-center text-sm mt-8">
-            &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
-          </p>
-        </footer>
+        </div>
+        <p className="text-center text-sm mt-8">
+          &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
+        </p>
+      </footer>
       </div>
     </div>
   );

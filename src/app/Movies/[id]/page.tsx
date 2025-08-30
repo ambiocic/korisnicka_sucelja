@@ -28,7 +28,7 @@ type PostProps = {
   params: Promise<{ id: string }>;
 };
 
-async function getMediaById(id: string): Promise<Media | null> {
+async function getMovieById(id: string): Promise<Media | null> {
   const { data, error } = await supabase
     .from("movies")
     .select("id, title, image, genre, release_year")
@@ -37,7 +37,6 @@ async function getMediaById(id: string): Promise<Media | null> {
 
   if (error || !data) {
     console.error("Error fetching movie:", error);
-    alert("Failed to fetch movie: " + (error?.message || "Unknown error"));
     return null;
   }
 
@@ -53,7 +52,6 @@ async function getReviews(movieId: string): Promise<Review[]> {
 
   if (error) {
     console.error("Error fetching reviews:", error);
-    alert("Failed to fetch reviews: " + (error.message || "Unknown error"));
     return [];
   }
 
@@ -71,37 +69,42 @@ export default function MoviePage({ params }: PostProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      const resolvedParams = await params;
-      const { id } = resolvedParams;
+      try {
+        setLoading(true);
+        const resolvedParams = await params;
+        const { id } = resolvedParams;
 
-      // Fetch movie
-      const movieData = await getMediaById(id);
-      if (!movieData) {
+        // Fetch movie
+        const movieData = await getMovieById(id);
+        if (!movieData) {
+          notFound();
+        }
+        setMedia(movieData);
+
+        // Fetch reviews
+        const reviewsData = await getReviews(id);
+        setReviews(reviewsData);
+
+        // Fetch user
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          console.log("Error fetching user:", userError);
+          setUser(null);
+        } else if (userData?.user) {
+          setUser(userData.user);
+        }
+      } catch (error) {
+        console.error("Error in fetchData:", error);
         notFound();
+      } finally {
+        setLoading(false);
       }
-      setMedia(movieData);
-
-      // Fetch reviews
-      const reviewsData = await getReviews(id);
-      setReviews(reviewsData);
-
-      // Fetch user
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        console.error("Error fetching user:", userError);
-        alert("Failed to fetch user data: " + (userError.message || "Unknown error"));
-      } else if (userData?.user) {
-        setUser(userData.user);
-      }
-
-      setLoading(false);
     };
 
     fetchData().catch((error) => {
-      console.error("Error in fetchData:", error);
-      alert("An error occurred while loading the page: " + (error.message || "Unknown error"));
+      console.error("Unexpected error in fetchData:", error);
       setLoading(false);
+      notFound();
     });
   }, [params]);
 
@@ -120,14 +123,14 @@ export default function MoviePage({ params }: PostProps) {
           filter: `movie_id=eq.${media.id}`,
         },
         (payload) => {
-          console.log("Real-time update:", payload); // Debugging
+          console.log("Real-time update:", payload);
           getReviews(media.id.toString()).then((reviewsData) => {
             setReviews(reviewsData);
           });
         }
       )
       .subscribe((status) => {
-        console.log("Subscription status:", status); // Debugging
+        console.log("Subscription status:", status);
       });
 
     return () => {

@@ -25,9 +25,17 @@ export default function Home() {
   // Fetch logged-in user
   useEffect(() => {
     const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (!error && data?.user) {
-        setUser(data.user);
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          console.log("Error fetching user:", error);
+          setUser(null);
+        } else if (data?.user) {
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error("Unexpected error fetching user:", error);
+        setUser(null);
       }
     };
     fetchUser();
@@ -64,7 +72,6 @@ export default function Home() {
       return;
     }
 
-    // Check if the item is already in the watchlist
     const { data: existingItems, error: checkError } = await supabase
       .from("watchlist")
       .select("id")
@@ -82,7 +89,6 @@ export default function Home() {
       return;
     }
 
-    // If not a duplicate, insert the item
     const { error } = await supabase.from("watchlist").insert([
       {
         user_id: user.id,
@@ -172,7 +178,7 @@ export default function Home() {
             {tvShows.map((tvShow) => (
               <div
                 key={tvShow.id}
-                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
+                className="bg-background rounded-xl overflow-hidden shadow-lg flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto border border-gray-300 dark:border-gray-700"
               >
                 <Link href={`/TVShows/${tvShow.id}`}>
                   <div className="relative w-full aspect-[3/4]">

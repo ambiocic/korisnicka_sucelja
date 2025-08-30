@@ -18,7 +18,7 @@ type Media = {
 type Review = {
   id: number;
   user_id: string;
-  tv_show_id: number | null;
+  tv_show_id: number;
   rating: number;
   review_text: string;
   created_at: string;
@@ -28,7 +28,7 @@ type PostProps = {
   params: Promise<{ id: string }>;
 };
 
-async function getMediaById(id: string): Promise<Media | null> {
+async function getTVShowById(id: string): Promise<Media | null> {
   const { data, error } = await supabase
     .from("tv_shows")
     .select("id, title, image, genre, release_year")
@@ -37,7 +37,6 @@ async function getMediaById(id: string): Promise<Media | null> {
 
   if (error || !data) {
     console.error("Error fetching TV show:", error);
-    alert("Failed to fetch TV show: " + (error?.message || "Unknown error"));
     return null;
   }
 
@@ -53,7 +52,6 @@ async function getReviews(tvShowId: string): Promise<Review[]> {
 
   if (error) {
     console.error("Error fetching reviews:", error);
-    alert("Failed to fetch reviews: " + (error.message || "Unknown error"));
     return [];
   }
 
@@ -71,37 +69,42 @@ export default function TVShowPage({ params }: PostProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      const resolvedParams = await params;
-      const { id } = resolvedParams;
+      try {
+        setLoading(true);
+        const resolvedParams = await params;
+        const { id } = resolvedParams;
 
-      // Fetch TV show
-      const mediaData = await getMediaById(id);
-      if (!mediaData) {
+        // Fetch TV show
+        const tvShowData = await getTVShowById(id);
+        if (!tvShowData) {
+          notFound();
+        }
+        setMedia(tvShowData);
+
+        // Fetch reviews
+        const reviewsData = await getReviews(id);
+        setReviews(reviewsData);
+
+        // Fetch user
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          console.log("Error fetching user:", userError);
+          setUser(null);
+        } else if (userData?.user) {
+          setUser(userData.user);
+        }
+      } catch (error) {
+        console.error("Error in fetchData:", error);
         notFound();
+      } finally {
+        setLoading(false);
       }
-      setMedia(mediaData);
-
-      // Fetch reviews
-      const reviewsData = await getReviews(id);
-      setReviews(reviewsData);
-
-      // Fetch user
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        console.error("Error fetching user:", userError);
-        alert("Failed to fetch user data: " + (userError.message || "Unknown error"));
-      } else if (userData?.user) {
-        setUser(userData.user);
-      }
-
-      setLoading(false);
     };
 
     fetchData().catch((error) => {
-      console.error("Error in fetchData:", error);
-      alert("An error occurred while loading the page: " + (error.message || "Unknown error"));
+      console.error("Unexpected error in fetchData:", error);
       setLoading(false);
+      notFound();
     });
   }, [params]);
 
@@ -120,14 +123,14 @@ export default function TVShowPage({ params }: PostProps) {
           filter: `tv_show_id=eq.${media.id}`,
         },
         (payload) => {
-          console.log("Real-time update:", payload); // Debugging
+          console.log("Real-time update:", payload);
           getReviews(media.id.toString()).then((reviewsData) => {
             setReviews(reviewsData);
           });
         }
       )
       .subscribe((status) => {
-        console.log("Subscription status:", status); // Debugging
+        console.log("Subscription status:", status);
       });
 
     return () => {
@@ -276,8 +279,7 @@ export default function TVShowPage({ params }: PostProps) {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-10 mt-24">
-      <h1 className="text-4xl font-extrabold tracking-tight mb-6">TV Show: {media.title}</h1>
-      <div className="w-full max-w-2xl bg-white p-6 rounded-lg border border-gray-200 shadow-md">
+      <div className="w-full max-w-2xl p-6 rounded-lg  shadow-md">
         {media.image && (
           <div className="relative w-full aspect-[3/4] mb-4">
             <Image
@@ -291,16 +293,16 @@ export default function TVShowPage({ params }: PostProps) {
             />
           </div>
         )}
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{media.title}</h2>
-        <p className="text-gray-700 mb-2">Genre: {media.genre || "N/A"}</p>
-        <p className="text-gray-700 mb-4">Release Year: {media.release_year || "N/A"}</p>
+        <h2 className="text-2xl font-extrabold mb-2">{media.title}</h2>
+        <p className=" mb-2 font-bold">Genre: {media.genre || "N/A"}</p>
+        <p className="mb-4 font-bold">Release Year: {media.release_year || "N/A"}</p>
 
         {/* Review Form */}
         {user && (
           <form onSubmit={handleReviewSubmit} className="mb-6">
             <h3 className="text-lg font-bold mb-2">Write a Review</h3>
             <div className="mb-2">
-              <label className="block text-sm text-gray-500">Rating (1–5):</label>
+              <label className="block text-sm ">Rating (1–5):</label>
               <select
                 value={newReview.rating || ""}
                 onChange={(e) => handleReviewChange("rating", Number(e.target.value))}
@@ -332,7 +334,7 @@ export default function TVShowPage({ params }: PostProps) {
         )}
 
         {/* Reviews Section */}
-        <h3 className="text-lg font-bold mb-4">Reviews</h3>
+        <h3 className="text-lg font-bold mb-4">Reviews: </h3>
         {reviews.length === 0 ? (
           <p className="text-gray-500">No reviews yet.</p>
         ) : (
