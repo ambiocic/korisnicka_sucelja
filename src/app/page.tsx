@@ -139,56 +139,54 @@ export default function Home() {
         </div>
 
         {/* Recommended Movies */}
-        <section className="mb-8 px-4">
-          <h2 className="text-2xl font-bold mb-4">Recommended Movies</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {movies.map((movie) => (
-              <div
-                key={movie.id}
-                className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 h-full"
-              >
-                {/* Link samo za sliku i informacije */}
-                <Link href={`/Movies/${movie.id}`} className="flex flex-col flex-1">
-                  <div className="relative w-full h-64 flex justify-center items-center">
-                    <Image
-                      src={movie.image}
-                      alt={movie.title}
-                      fill
-                      className="object-contain"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      {movie.genre}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Release Year: {movie.release_year}
-                    </p>
-                  </div>
-                </Link>
-
-                {/* Dugme izvan Linka da hover ne utječe na tekst */}
-                <div className="p-4">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      addToWatchlist(movie, "movie");
-                    }}
-                    className="bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500 w-full"
-                  >
-                    Add to Watchlist
-                  </button>
-                </div>
-              </div>
-            ))}
+<section className="mb-8 px-4">
+  <h2 className="text-2xl font-bold mb-4">Recommended Movies</h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {movies.map((movie) => (
+      <div
+        key={movie.id}
+        className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 h-full"
+      >
+        {/* Slika i info */}
+        <Link href={`/Movies/${movie.id}`} className="flex flex-col flex-1">
+          <div className="relative w-full h-80">
+            <Image
+              src={movie.image}
+              alt={movie.title}
+              fill
+              className="object-cover rounded-t-xl"
+              unoptimized
+            />
           </div>
-        </section>
+          <div className="p-4 flex flex-col flex-1">
+            <h3 className="text-lg font-bold mb-2">{movie.title}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              {movie.genre}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Release Year: {movie.release_year}
+            </p>
+          </div>
+        </Link>
 
+        {/* Dugme */}
+        <div className="p-4">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              addToWatchlist(movie, "movie");
+            }}
+            className="bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500 w-full"
+          >
+            Add to Watchlist
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
 
-        {/* Trending TV Shows */}
-        {/* Trending TV Shows */}
+{/* Trending TV Shows */}
 <section className="mb-8 px-4">
   <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -197,14 +195,14 @@ export default function Home() {
         key={tvShow.id}
         className="bg-background rounded-xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700 flex flex-col transition-transform hover:scale-105 h-full"
       >
-        {/* Link samo za sliku i informacije */}
+        {/* Slika i info */}
         <Link href={`/TVShows/${tvShow.id}`} className="flex flex-col flex-1">
-          <div className="relative w-full h-64 flex justify-center items-center">
+          <div className="relative w-full h-80">
             <Image
               src={tvShow.image}
               alt={tvShow.title}
               fill
-              className="object-contain"
+              className="object-cover rounded-t-xl"
               unoptimized
             />
           </div>
@@ -219,7 +217,7 @@ export default function Home() {
           </div>
         </Link>
 
-        {/* Dugme izvan Linka da hover ne utječe na tekst */}
+        {/* Dugme */}
         <div className="p-4">
           <button
             onClick={(e) => {
@@ -235,6 +233,7 @@ export default function Home() {
     ))}
   </div>
 </section>
+
 
       </div>
 

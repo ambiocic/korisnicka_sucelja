@@ -25,9 +25,6 @@ export default function AboutUs() {
 
         {/* About Section */}
         <section className="max-w-4xl mx-auto mb-16 px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-            Who Are We
-          </h2>
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
             FilmNest is a passionate community of movie and TV show enthusiasts.
             Our mission is to help viewers discover, track, and enjoy the best
