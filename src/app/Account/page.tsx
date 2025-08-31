@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaLock } from "react-icons/fa";
 import { Logo } from "@/app/components/Logo";
+import { Footer } from "@/app/components/footer";
 import { Navigation } from "@/app/components/Navigation";
 
 export default function AccountPage() {
@@ -121,67 +122,7 @@ export default function AccountPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-800 dark:bg-gray-900 text-foreground py-8 mt-auto">
-        <div className="container mx-auto flex flex-col md:flex-row justify-center md:justify-around items-center gap-8">
-          <div className="flex items-center h-full">
-            <Logo />
-          </div>
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-extrabold mb-4">Sitemap</h3>
-            <ul>
-              <li className="mb-2">
-                <a href="/Movies" className="hover:text-yellow-400">
-                  Movies
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/TVShows" className="hover:text-yellow-400">
-                  TV Shows
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/Account" className="hover:text-yellow-400">
-                  Account
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/AboutUs" className="hover:text-yellow-400">
-                  About Us
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-extrabold mb-4">Contact Us</h3>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaMapMarkerAlt className="mr-2" /> Ruđera Boškovića 32, 21000 Split, Croatia
-            </p>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaPhone className="mr-2" /> +385 000 000
-            </p>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaEnvelope className="mr-2" /> filmnest@fesb.hr
-            </p>
-            <div className="flex space-x-4 justify-center md:justify-start mt-4">
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaFacebook size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaTwitter size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaInstagram size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaLinkedin size={24} />
-              </a>
-            </div>
-          </div>
-        </div>
-        <p className="text-center text-sm mt-8">
-          &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
-        </p>
-      </footer>
+      <Footer></Footer>
     </div>
   );
 }

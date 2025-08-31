@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { Logo } from "@/app/components/Logo";
+import { Footer } from "@/app/components/footer";
 import Link from "next/link";
 
 export default function TVShows() {
@@ -198,38 +199,41 @@ export default function TVShows() {
         </section>
 
         {/* TV Shows Section */}
+        {/* TV Shows Section */}
         <section className="mb-8 px-4">
           <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {tvShows.map((tvShow) => (
               <div
                 key={tvShow.id}
-                className="bg-background rounded-xl overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105 max-w-xs mx-auto"
+                className="bg-background rounded-lg overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105"
               >
-                <Link href={`/TVShows/${tvShow.id}`}>
-                  <div className="relative w-full aspect-[3/4]">
+                {/* Link samo za sliku i informacije */}
+                <Link href={`/TVShows/${tvShow.id}`} className="flex flex-col flex-1">
+                  <div className="relative w-full aspect-[2/3]">
                     <Image
                       src={tvShow.image}
                       alt={tvShow.title}
-                      width={300}
-                      height={400}
+                      fill
                       style={{ objectFit: "cover" }}
                       className="w-full h-full"
                       unoptimized
                     />
                   </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <h3 className="text-lg font-bold mb-2">{tvShow.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Release Year: {tvShow.release_year}</p>
+                  <div className="p-2 flex flex-col flex-1">
+                    <h3 className="text-sm font-bold mb-1">{tvShow.title}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Year: {tvShow.release_year}</p>
                   </div>
                 </Link>
-                <div className="p-4">
+
+                {/* Dugme izvan Linka */}
+                <div className="p-2">
                   <button
                     onClick={() => addToWatchlist(tvShow, "tv_show")}
-                    className="mt-3 bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500 w-full"
+                    className="bg-yellow-400 text-white py-1 px-2 rounded hover:bg-yellow-500 w-full text-sm"
                   >
-                    Add to Watchlist
+                    Add
                   </button>
                 </div>
               </div>
@@ -237,69 +241,9 @@ export default function TVShows() {
           </div>
         </section>
 
+
         {/* Footer Section */}
-         {/* Footer */}
-      <footer className="bg-gray-800 dark:bg-gray-900 text-foreground py-8 mt-auto">
-        <div className="container mx-auto flex flex-col md:flex-row justify-center md:justify-around items-center gap-8">
-          <div className="flex items-center h-full">
-            <Logo />
-          </div>
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-extrabold mb-4">Sitemap</h3>
-            <ul>
-              <li className="mb-2">
-                <a href="/Movies" className="hover:text-yellow-400">
-                  Movies
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/TVShows" className="hover:text-yellow-400">
-                  TV Shows
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/Account" className="hover:text-yellow-400">
-                  Account
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/AboutUs" className="hover:text-yellow-400">
-                  About Us
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-extrabold mb-4">Contact Us</h3>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaMapMarkerAlt className="mr-2" /> Ruđera Boškovića 32, 21000 Split, Croatia
-            </p>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaPhone className="mr-2" /> +385 000 000
-            </p>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaEnvelope className="mr-2" /> filmnest@fesb.hr
-            </p>
-            <div className="flex space-x-4 justify-center md:justify-start mt-4">
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaFacebook size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaTwitter size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaInstagram size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaLinkedin size={24} />
-              </a>
-            </div>
-          </div>
-        </div>
-        <p className="text-center text-sm mt-8">
-          &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
-        </p>
-      </footer>
+         <Footer></Footer>
       </div>
     </div>
   );

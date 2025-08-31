@@ -1,8 +1,7 @@
 "use client";
 
-import { Navigation } from "../components/Navigation";  // Assuming the Navigation component is already created
-import { Logo } from "../components/Logo";  // Assuming the Logo component is already created
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaMapMarkerAlt, FaPhone, FaEnvelope } from "react-icons/fa";
+import { Navigation } from "../components/Navigation";  
+import { Footer } from "../components/footer";
 
 export default function AboutUs() {
   return (
@@ -13,7 +12,7 @@ export default function AboutUs() {
       {/* Page Content */}
       <div className="mt-32 mx-4">
         {/* Hero Section */}
-        <div className="relative bg-cover bg-center h-64 mb-4 mx-4 mt-24">
+        <div className="relative bg-cover bg-center h-64 mb-8 mx-4 mt-24">
           <div className="absolute border rounded-lg inset-0 bg-background dark:bg-gray-800 shadow-lg flex flex-col justify-center items-start p-6">
             <h1 className="text-foreground dark:text-white text-3xl md:text-5xl font-extrabold mb-4">
               About <span className="text-yellow-400">Us</span>
@@ -24,71 +23,33 @@ export default function AboutUs() {
           </div>
         </div>
 
-      
+        {/* About Section */}
+        <section className="max-w-4xl mx-auto mb-16 px-4">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
+            Who Are We
+          </h2>
+          <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
+            FilmNest is a passionate community of movie and TV show enthusiasts.
+            Our mission is to help viewers discover, track, and enjoy the best
+            content from around the world. Whether you’re looking for the latest
+            blockbuster or a hidden gem, FilmNest has you covered.
+          </p>
+          <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
+            Our team is composed of dedicated developers, designers, and film
+            lovers who share a common goal: to create a seamless experience for
+            discovering and enjoying media. We believe that great stories deserve
+            to be seen, and our platform is here to make that possible.
+          </p>
+          <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
+            Join our community today and start exploring! Keep track of your
+            favorites, get recommendations, and never miss out on the shows and
+            movies you love.
+          </p>
+        </section>
       </div>
-        {/* Footer Section */}
-    {/* Footer */}
-      <footer className="bg-gray-800 dark:bg-gray-900 text-foreground py-8 mt-auto">
-        <div className="container mx-auto flex flex-col md:flex-row justify-center md:justify-around items-center gap-8">
-          <div className="flex items-center h-full">
-            <Logo />
-          </div>
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-extrabold mb-4">Sitemap</h3>
-            <ul>
-              <li className="mb-2">
-                <a href="/Movies" className="hover:text-yellow-400">
-                  Movies
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/TVShows" className="hover:text-yellow-400">
-                  TV Shows
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/Account" className="hover:text-yellow-400">
-                  Account
-                </a>
-              </li>
-              <li className="mb-2">
-                <a href="/AboutUs" className="hover:text-yellow-400">
-                  About Us
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-extrabold mb-4">Contact Us</h3>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaMapMarkerAlt className="mr-2" /> Ruđera Boškovića 32, 21000 Split, Croatia
-            </p>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaPhone className="mr-2" /> +385 000 000
-            </p>
-            <p className="flex items-center justify-center md:justify-start mb-2">
-              <FaEnvelope className="mr-2" /> filmnest@fesb.hr
-            </p>
-            <div className="flex space-x-4 justify-center md:justify-start mt-4">
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaFacebook size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaTwitter size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaInstagram size={24} />
-              </a>
-              <a href="#" className="text-foreground hover:text-yellow-400">
-                <FaLinkedin size={24} />
-              </a>
-            </div>
-          </div>
-        </div>
-        <p className="text-center text-sm mt-8">
-          &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
-        </p>
-      </footer>
+
+      {/* Footer Section */}
+      <Footer />
     </div>
   );
 }
