@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { Logo } from "./Logo";
+import Link from "next/link";
 
 export const Footer = () => {
   const [sitemapOpen, setSitemapOpen] = useState(false);
@@ -27,19 +28,21 @@ export const Footer = () => {
             className={`mt-2 md:mt-4 space-y-2 ${sitemapOpen ? "block" : "hidden"} md:block text-white text-lg`}
           >
             <li>
-              <a href="/Movies" className="text-white hover:text-yellow-400 block">Movies</a>
+              <Link href="/Movies" className="text-white hover:text-yellow-400 block">Movies</Link>
             </li>
             <li>
-              <a href="/TVShows" className="text-white hover:text-yellow-400 block">TV Shows</a>
+              <Link href="/TVShows" className="text-white hover:text-yellow-400 block">TV Shows</Link>
             </li>
             <li>
-              <a href="/Account" className="text-white hover:text-yellow-400 block">Account</a>
+              <Link href="/Account" className="text-white hover:text-yellow-400 block">Account</Link>
             </li>
             <li>
-              <a href="/AboutUs" className="text-white hover:text-yellow-400 block">About Us</a>
+              <Link href="/AboutUs" className="text-white hover:text-yellow-400 block">About Us</Link>
             </li>
           </ul>
         </div>
+
+        
 
         {/* Contact */}
         <div className="text-center md:text-left w-full md:w-auto flex flex-col items-center md:items-start">

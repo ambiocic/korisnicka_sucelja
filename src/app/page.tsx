@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Navigation } from "./components/Navigation";
 
 
-import { Logo } from "./components/Logo";
 import { Footer } from "./components/footer";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
@@ -23,7 +22,6 @@ export default function Home() {
   const [movies, setMovies] = useState<Media[]>([]);
   const [tvShows, setTvShows] = useState<Media[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const [sitemapOpen, setSitemapOpen] = useState(false);
 
   // Fetch logged-in user
   useEffect(() => {

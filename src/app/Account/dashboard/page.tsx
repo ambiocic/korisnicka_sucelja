@@ -28,8 +28,9 @@ export default function Dashboard() {
   const router = useRouter();
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Removed unused loading state
   const [showAccountDetails, setShowAccountDetails] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -38,6 +39,14 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUser = async () => {
       setLoading(true);
+       // Show a loading spinner while data is being fetched
+      if (loading) {
+        return (
+          <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-yellow-400"></div>
+          </div>
+        );
+      }
       const { data, error } = await supabase.auth.getUser();
       if (error || !data.user) {
         router.push("/Account");
@@ -63,7 +72,7 @@ export default function Dashboard() {
         tv_show:tv_shows(id, title, image, genre, release_year)
       `)
       .eq("user_id", user.id)
-      .order("id", { ascending: false }) as { data: WatchlistItem[] | null; error: any };
+      .order("id", { ascending: false }) as { data: WatchlistItem[] | null; error: Error | null };
 
     if (error) {
       console.error("Error fetching watchlist:", error);
@@ -360,3 +369,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

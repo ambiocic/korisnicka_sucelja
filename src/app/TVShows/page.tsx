@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { Navigation } from "../components/Navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
-import { Logo } from "@/app/components/Logo";
 import { Footer } from "@/app/components/footer";
 import Link from "next/link";
 

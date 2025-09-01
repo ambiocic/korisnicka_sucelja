@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   FaFilm,
   FaTv,
-  FaRegNewspaper,
   FaUserAlt,
   FaInfoCircle,
   FaBars,
@@ -14,11 +13,13 @@ import {
 import { Logo } from "./Logo";
 import { supabase } from "@/lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation"; 
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Dohvati trenutno logiranog korisnika
@@ -141,17 +142,22 @@ export function Navigation() {
           processPage(page, index, () => setIsMenuOpen(false))
         )}
         {user && (
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              setUser(null);
+        <button
+          onClick={async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+              console.error("Logout failed:", error.message);
+            } else {
+              router.push("/Account"); // 👈 prebacivanje na login/register
               setIsMenuOpen(false);
-            }}
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded w-full text-center"
-          >
-            Logout
-          </button>
-        )}
+            }
+          }}
+          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded w-full text-center"
+        >
+          Logout
+        </button>
+      )}
+
       </div>
     </nav>
   );
