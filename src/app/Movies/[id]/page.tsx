@@ -28,6 +28,9 @@ type PostProps = {
   params: Promise<{ id: string }>;
 };
 
+
+
+
 async function getMovieById(id: string): Promise<Media | null> {
   const { data, error } = await supabase
     .from("movies")
@@ -55,7 +58,6 @@ async function getReviews(movieId: string): Promise<Review[]> {
     return [];
   }
 
-  console.log("Fetched reviews:", data); // Debugging
   return (data as Review[]) || [];
 }
 
@@ -64,9 +66,12 @@ export default function MoviePage({ params }: PostProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [newReview, setNewReview] = useState<{ rating: number; text: string }>({ rating: 0, text: "" });
-  const [editReview, setEditReview] = useState<{ [key: number]: { rating: number; text: string } }>({});
   const [loading, setLoading] = useState(true);
+// unutar MoviePage komponente
+const [isModalOpen, setIsModalOpen] = useState(false);
 
+// funkcija za otvaranje/zatvaranje modala
+const toggleModal = () => setIsModalOpen(!isModalOpen);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -74,25 +79,15 @@ export default function MoviePage({ params }: PostProps) {
         const resolvedParams = await params;
         const { id } = resolvedParams;
 
-        // Fetch movie
         const movieData = await getMovieById(id);
-        if (!movieData) {
-          notFound();
-        }
+        if (!movieData) notFound();
         setMedia(movieData);
 
-        // Fetch reviews
         const reviewsData = await getReviews(id);
         setReviews(reviewsData);
 
-        // Fetch user
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-        if (userError) {
-          console.log("Error fetching user:", userError);
-          setUser(null);
-        } else if (userData?.user) {
-          setUser(userData.user);
-        }
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) setUser(userData.user);
       } catch (error) {
         console.error("Error in fetchData:", error);
         notFound();
@@ -101,61 +96,54 @@ export default function MoviePage({ params }: PostProps) {
       }
     };
 
-    fetchData().catch((error) => {
-      console.error("Unexpected error in fetchData:", error);
-      setLoading(false);
-      notFound();
-    });
+    fetchData().catch(() => setLoading(false));
   }, [params]);
 
-  // Real-time subscription for reviews
-  useEffect(() => {
-    if (!media) return;
+  const handleAddToWatchlist = async () => {
+    if (!user || !media) {
+      alert("Please sign in to add to your watchlist.");
+      return;
+    }
 
-    const subscription = supabase
-      .channel(`reviews_movie_${media.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "reviews",
-          filter: `movie_id=eq.${media.id}`,
-        },
-        (payload) => {
-          console.log("Real-time update:", payload);
-          getReviews(media.id.toString()).then((reviewsData) => {
-            setReviews(reviewsData);
-          });
-        }
-      )
-      .subscribe((status) => {
-        console.log("Subscription status:", status);
-      });
+    const { data: existing } = await supabase
+      .from("watchlist")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("movie_id", media.id)
+      .single();
 
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, [media]);
+    if (existing) {
+      alert("Movie is already in your watchlist.");
+      return;
+    }
 
-  // Handle review submission
+    const { error } = await supabase.from("watchlist").insert([
+      {
+        user_id: user.id,
+        movie_id: media.id,
+        tv_show_id: null,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error adding to watchlist:", error);
+      alert("Failed to add to watchlist.");
+    } else {
+      alert("Movie added to your watchlist!");
+    }
+  };
+
   const handleReviewSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user) {
+    if (!user || !media) {
       alert("Please sign in to submit a review.");
       return;
     }
-    if (!media) {
-      alert("Movie not found.");
+    if (!newReview.rating) {
+      alert("Please select a rating.");
       return;
     }
-
-    const { rating, text } = newReview;
-    if (!rating || rating < 1 || rating > 5) {
-      alert("Please select a rating between 1 and 5.");
-      return;
-    }
-    if (!text.trim()) {
+    if (!newReview.text.trim()) {
       alert("Please enter a review.");
       return;
     }
@@ -165,14 +153,14 @@ export default function MoviePage({ params }: PostProps) {
         user_id: user.id,
         movie_id: media.id,
         tv_show_id: null,
-        rating,
-        review_text: text,
+        rating: newReview.rating,
+        review_text: newReview.text,
       },
     ]);
 
     if (error) {
       console.error("Error submitting review:", error);
-      alert("Failed to submit review: " + (error.message || "Unknown error"));
+      alert("Failed to submit review.");
     } else {
       alert("Review submitted successfully!");
       setNewReview({ rating: 0, text: "" });
@@ -181,223 +169,186 @@ export default function MoviePage({ params }: PostProps) {
     }
   };
 
-  // Handle review update
-  const handleReviewUpdate = async (reviewId: number, e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!user) {
-      alert("Please sign in to update a review.");
-      return;
-    }
-
-    const { rating, text } = editReview[reviewId] || { rating: 0, text: "" };
-    if (!rating || rating < 1 || rating > 5) {
-      alert("Please select a rating between 1 and 5.");
-      return;
-    }
-    if (!text.trim()) {
-      alert("Please enter a review.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("reviews")
-      .update({ rating, review_text: text })
-      .eq("id", reviewId)
-      .eq("user_id", user.id);
-
-    if (error) {
-      console.error("Error updating review:", error);
-      alert("Failed to update review: " + (error.message || "Unknown error"));
-    } else {
-      alert("Review updated successfully!");
-      setEditReview((prev) => {
-        const newEditReview = { ...prev };
-        delete newEditReview[reviewId];
-        return newEditReview;
-      });
-      const reviewsData = await getReviews(media!.id.toString());
-      setReviews(reviewsData);
-    }
-  };
-
-  // Handle review deletion
-  const handleReviewDelete = async (reviewId: number) => {
-    if (!user) {
-      alert("Please sign in to delete a review.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("reviews")
-      .delete()
-      .eq("id", reviewId)
-      .eq("user_id", user.id);
-
-    if (error) {
-      console.error("Error deleting review:", error);
-      alert("Failed to delete review: " + (error.message || "Unknown error"));
-    } else {
-      alert("Review deleted successfully!");
-      const reviewsData = await getReviews(media!.id.toString());
-      setReviews(reviewsData);
-    }
-  };
-
-  // Handle review input changes
-  const handleReviewChange = (field: "rating" | "text", value: string | number) => {
-    setNewReview((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Handle review edit changes
-  const handleReviewEditChange = (reviewId: number, field: "rating" | "text", value: string | number) => {
-    setEditReview((prev) => ({
-      ...prev,
-      [reviewId]: {
-        rating: prev[reviewId]?.rating ?? 0,
-        text: prev[reviewId]?.text ?? "",
-        [field]: value,
-      },
-    }));
-  };
+  const averageRating =
+    reviews.length > 0
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+      : null;
 
   if (loading) {
     return (
       <main className="flex min-h-screen flex-col items-center p-10 mt-24">
-        <div className="w-full max-w-2xl bg-gray-200 dark:bg-gray-700 p-6 rounded-lg border border-gray-200 shadow-md animate-pulse">
-          <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded mb-4"></div>
-          <div className="h-64 bg-gray-300 dark:bg-gray-600 rounded mb-4"></div>
-          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
-          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        </div>
+        <div className="w-full max-w-2xl bg-gray-200 dark:bg-gray-700 p-6 rounded-lg border border-gray-200 shadow-md animate-pulse"></div>
       </main>
     );
   }
 
-  if (!media) {
-    notFound();
-  }
+  if (!media) notFound();
 
   return (
     <main className="flex min-h-screen flex-col items-center p-10 mt-24">
-      <h1 className="text-4xl font-extrabold tracking-tight mb-6">Movie: {media.title}</h1>
-      <div className="w-full max-w-2xl bg-white p-6 rounded-lg border border-gray-200 shadow-md">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 shadow-md flex flex-col md:flex-row gap-6">
+        {/* Movie Image */}
         {media.image && (
-          <div className="relative w-full aspect-[3/4] mb-4">
-            <Image
-              src={media.image}
-              alt={media.title}
-              width={300}
-              height={400}
-              style={{ objectFit: "cover" }}
-              className="w-full h-full rounded"
-              unoptimized
-            />
-          </div>
-        )}
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{media.title}</h2>
-        <p className="text-gray-700 mb-2">Genre: {media.genre || "N/A"}</p>
-        <p className="text-gray-700 mb-4">Release Year: {media.release_year || "N/A"}</p>
-
-        {/* Review Form */}
-        {user && (
-          <form onSubmit={handleReviewSubmit} className="mb-6">
-            <h3 className="text-lg font-bold mb-2">Write a Review</h3>
-            <div className="mb-2">
-              <label className="block text-sm text-gray-500">Rating (1–5):</label>
-              <select
-                value={newReview.rating || ""}
-                onChange={(e) => handleReviewChange("rating", Number(e.target.value))}
-                className="w-full p-2 border rounded"
-              >
-                <option value="">Select rating</option>
-                {[1, 2, 3, 4, 5].map((num) => (
-                  <option key={num} value={num}>{num}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-2">
-              <label className="block text-sm text-gray-500">Your Review:</label>
-              <textarea
-                value={newReview.text}
-                onChange={(e) => handleReviewChange("text", e.target.value)}
-                className="w-full p-2 border rounded"
-                rows={4}
-                placeholder="Write your review..."
+          <div className="flex flex-col items-center w-full md:w-1/3">
+            <div className="relative w-full aspect-[2/3] mb-4">
+              <Image
+                src={media.image}
+                alt={media.title}
+                fill
+                style={{ objectFit: "cover" }}
+                className="rounded"
+                unoptimized
               />
             </div>
             <button
-              type="submit"
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              onClick={handleAddToWatchlist}
+              className="bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500 w-full"
             >
-              Submit Review
+              Add to Watchlist
             </button>
-          </form>
+          </div>
         )}
 
-        {/* Reviews Section */}
-        <h3 className="text-lg font-bold mb-4">Reviews</h3>
-        {reviews.length === 0 ? (
-          <p className="text-gray-500">No reviews yet.</p>
-        ) : (
-          reviews.map((review) => (
-            <div key={review.id} className="mb-4 border-t pt-4">
-              <p className="text-sm text-gray-500">
-                <strong>{review.user_id.slice(0, 8)}</strong>: {review.rating} ★
-              </p>
-              <p className="text-sm text-gray-700">{review.review_text}</p>
-              <p className="text-xs text-gray-400">
-                {new Date(review.created_at).toLocaleDateString("hr-HR")}
-              </p>
-              {user && user.id === review.user_id && (
-                <div className="mt-2">
-                  <form onSubmit={(e) => handleReviewUpdate(review.id, e)} className="mb-2">
-                    <div className="mb-2">
-                      <label className="block text-sm text-gray-500">Edit Rating:</label>
-                      <select
-                        value={editReview[review.id]?.rating || review.rating}
-                        onChange={(e) =>
-                          handleReviewEditChange(review.id, "rating", Number(e.target.value))
-                        }
-                        className="w-full p-2 border rounded"
-                      >
-                        <option value="">Select rating</option>
-                        {[1, 2, 3, 4, 5].map((num) => (
-                          <option key={num} value={num}>{num}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-2">
-                      <label className="block text-sm text-gray-500">Edit Review:</label>
-                      <textarea
-                        value={editReview[review.id]?.text || review.review_text}
-                        onChange={(e) => handleReviewEditChange(review.id, "text", e.target.value)}
-                        className="w-full p-2 border rounded"
-                        rows={3}
-                        placeholder="Edit your review..."
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600"
-                    >
-                      Update Review
-                    </button>
-                  </form>
-                  <button
-                    onClick={() => handleReviewDelete(review.id)}
-                    className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
-                  >
-                    Delete Review
-                  </button>
-                </div>
-              )}
-            </div>
-          ))
-        )}
-        <Link href="/Movies" className="text-blue-500 hover:underline mt-4 inline-block">
-          Back to Movies
-        </Link>
+        {/* Movie Info */}
+        <div className="flex-1 flex flex-col justify-start">
+          <h1 className="text-3xl font-extrabold mb-2">{media.title}</h1>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
+            This is a placeholder for the movie description. Once added to the database, the description will appear here.
+          </p>
+        </div>
       </div>
+
+      {/* Reviews Section */}
+<div className="w-full max-w-4xl mt-6">
+  <h3 className="text-xl font-bold mb-4">Reviews</h3>
+
+  {reviews.length === 0 ? (
+    <p className="text-gray-500">No reviews yet.</p>
+  ) : (
+    <>
+      {/* Average rating + rating graph */}
+      <div className="flex flex-col md:flex-row items-start md:items-center mb-6 gap-6">
+        {/* Average Rating */}
+        <div className="flex flex-col items-center md:items-start w-full md:w-1/3">
+          <p className="text-3xl font-bold text-yellow-400">
+            {averageRating} ★
+          </p>
+          <p className="text-gray-600">{reviews.length} reviews</p>
+        </div>
+
+        {/* Rating Graph */}
+        <div className="flex-1 w-full md:w-2/3">
+          {Array.from({ length: 5 }, (_, i) => 5 - i).map((star) => {
+            const count = reviews.filter((r) => r.rating === star).length;
+            const percentage = (count / reviews.length) * 100;
+            return (
+              <div key={star} className="flex items-center mb-1">
+                <span className="w-10 text-sm">{star} ★</span>
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded h-3 ml-2 relative">
+                  <div
+                    className="bg-yellow-400 h-3 rounded"
+                    style={{ width: `${percentage}%` }}
+                  ></div>
+                </div>
+                <span className="w-8 text-sm text-right ml-2">{count}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Reviews List */}
+      <div className="flex flex-col gap-4">
+        {reviews.map((review) => (
+          <div key={review.id} className="border-t pt-4">
+            <p className="text-sm text-gray-500">
+              <strong>{review.user_id.slice(0, 8)}</strong>: {review.rating} ★
+            </p>
+            <p className="text-sm text-gray-700">{review.review_text}</p>
+            <p className="text-xs text-gray-400">
+              {new Date(review.created_at).toLocaleDateString("hr-HR")}
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
+  )}
+
+  {/* Add Review button + Back link */}
+<div className="w-full max-w-4xl flex justify-between mt-6">
+  {user && (
+    <button
+      onClick={toggleModal}
+      className="bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500"
+    >
+      Add a Review
+    </button>
+  )}
+  <Link href="/Movies" className="text-gray-800 hover:underline">
+    Back to Movies
+  </Link>
+</div>
+
+{/* Review Modal */}
+{isModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md relative">
+      <button
+        onClick={toggleModal}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+      >
+        ✕
+      </button>
+      <h3 className="text-lg font-bold mb-4">Write a Review</h3>
+      <form onSubmit={handleReviewSubmit}>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1">Rating:</label>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setNewReview({ ...newReview, rating: star })}
+                className={`text-2xl ${
+                  newReview.rating >= star ? "text-yellow-400" : "text-gray-300"
+                } hover:text-yellow-500 transition-colors`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1">Your Review:</label>
+          <textarea
+            value={newReview.text}
+            onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-yellow-300"
+            rows={4}
+            placeholder="Write your review..."
+          />
+        </div>
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={toggleModal}
+            className="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          >
+            Submit Review
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+</div>
     </main>
   );
 }
