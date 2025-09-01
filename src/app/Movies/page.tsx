@@ -5,125 +5,100 @@ import { useEffect, useState } from "react";
 import { Navigation } from "../components/Navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
-import { Logo } from "@/app/components/Logo";
 import { Footer } from "@/app/components/footer";
 import Link from "next/link";
 
+type Media = {
+  id: number;
+  title: string;
+  image: string;
+  genre: string;
+  release_year: number;
+  rating?: number;
+};
+
 export default function Movies() {
-  const [filters, setFilters] = useState({
-    genre: "All",
-    rating: "All",
-    userRating: "All",
-    releaseYear: "All",
+  const [movies, setMovies] = useState<Media[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState<Media[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [sortBy, setSortBy] = useState("ratingDesc");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterOptions, setFilterOptions] = useState({
+    genre: "",
+    releaseYear: "",
+    rating: "",
   });
 
-  type Media = {
-    id: number;
-    title: string;
-    image: string;
-    genre: string;
-    release_year: number;
-  };
-
-  const [movies, setMovies] = useState<Media[]>([]);
-  const [user, setUser] = useState<User | null>(null);
-
-  // Fetch user on component mount
   useEffect(() => {
+    // Fetch user
     const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (!error && data?.user) {
-        setUser(data.user);
-      }
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) setUser(data.user);
     };
     fetchUser();
+
+    // Fetch movies
+    fetchMovies();
   }, []);
 
-  // Fetch movies with filters
-  useEffect(() => {
-    fetchMovies();
-  }, [filters]);
-
   const fetchMovies = async () => {
-    let query = supabase
+    const { data } = await supabase
       .from("movies")
-      .select("id, title, image, genre, release_year")
-      .limit(10);
-
-    // Apply genre filter
-    if (filters.genre !== "All") {
-      query = query.eq("genre", filters.genre);
-    }
-
-    // Apply release year filter
-    if (filters.releaseYear !== "All") {
-      const decadeStart = parseInt(filters.releaseYear.replace("s", ""));
-      query = query
-        .gte("release_year", decadeStart)
-        .lte("release_year", decadeStart + 9);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error("Error fetching movies:", error);
-      alert("Failed to fetch movies: " + (error.message || "Unknown error"));
-    } else {
-      setMovies(data ?? []);
-    }
+      .select("id, title, image, genre, release_year");
+    if (data) setMovies(data as Media[]);
   };
 
-  // Add to watchlist with duplicate check
-  const addToWatchlist = async (item: Media, type: "movie" | "tv_show") => {
+  // Apply sort and filter
+  useEffect(() => {
+    let updated = [...movies];
+
+    // Filter
+    if (filterOptions.genre) updated = updated.filter(m => m.genre === filterOptions.genre);
+    if (filterOptions.releaseYear) {
+      const decade = parseInt(filterOptions.releaseYear.replace("s", ""));
+      updated = updated.filter(m => m.release_year! >= decade && m.release_year! <= decade + 9);
+    }
+    if (filterOptions.rating) {
+      updated = updated.filter(m => (m.rating || 0) >= parseInt(filterOptions.rating));
+    }
+
+    // Sort
+    if (sortBy === "ratingDesc") updated.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    if (sortBy === "ratingAsc") updated.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+    if (sortBy === "nameAsc") updated.sort((a, b) => a.title.localeCompare(b.title));
+    if (sortBy === "nameDesc") updated.sort((a, b) => b.title.localeCompare(a.title));
+
+    setFilteredMovies(updated);
+  }, [movies, sortBy, filterOptions]);
+
+  const addToWatchlist = async (item: Media) => {
     if (!user) {
       alert("Please sign in to add to your watchlist.");
       return;
     }
-
-    // Check if the item is already in the watchlist
-    const { data: existingItems, error: checkError } = await supabase
+    const { data: existing } = await supabase
       .from("watchlist")
       .select("id")
       .eq("user_id", user.id)
-      .eq(type === "movie" ? "movie_id" : "tv_show_id", item.id);
+      .eq("movie_id", item.id)
+      .single();
 
-    if (checkError) {
-      console.error("Error checking watchlist:", checkError);
-      alert("Failed to check watchlist. Please try again.");
-      return;
-    }
-
-    if (existingItems && existingItems.length > 0) {
+    if (existing) {
       alert(`${item.title} is already in your watchlist!`);
       return;
     }
 
-    // If not a duplicate, insert the item
-    const { error } = await supabase.from("watchlist").insert([
-      {
-        user_id: user.id,
-        movie_id: type === "movie" ? item.id : null,
-        tv_show_id: type === "tv_show" ? item.id : null,
-      },
-    ]);
-
-    if (error) {
-      console.error("Error adding to watchlist:", error);
-      alert("Failed to add item to watchlist.");
-    } else {
-      alert(`${item.title} added to your watchlist!`);
-    }
+    const { error } = await supabase.from("watchlist").insert([{ user_id: user.id, movie_id: item.id }]);
+    if (error) alert("Failed to add item to watchlist.");
+    else alert(`${item.title} added to your watchlist!`);
   };
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      {/* Navigation Bar */}
       <Navigation />
 
-      {/* Page Content */}
       <div className="mt-32 mx-4">
-        {/* Hero Section */}
+        {/* Hero */}
         <div className="relative bg-cover bg-center h-64 mb-4 mx-4 mt-24">
           <div className="absolute inset-0 bg-background shadow-lg flex flex-col justify-center items-start p-6">
             <h1 className="text-foreground text-3xl md:text-5xl font-extrabold mb-4">
@@ -135,90 +110,152 @@ export default function Movies() {
           </div>
         </div>
 
-        {/* Filters Section */}
-        <section className="mb-8 px-4">
-          <h2 className="text-2xl font-bold mb-4">Filters</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Filter by Genre */}
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Genre</h3>
-              <select
-                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
-                onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
-              >
-                <option value="All">All</option>
-                <option value="Action">Action</option>
-                <option value="Sci-Fi">Sci-Fi</option>
-                <option value="Romance">Romance</option>
-              </select>
-            </div>
+        {/* Sort & Filter bar */}
+        <div className="flex justify-between items-center mb-6 px-4">
+          {/* Sort By */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="sort" className="font-semibold text-yellow-400">Sort By:</label>
+            <select
+              id="sort"
+              className="border rounded p-1"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="ratingDesc">Rating (High to Low)</option>
+              <option value="ratingAsc">Rating (Low to High)</option>
+              <option value="nameAsc">Name (A-Z)</option>
+              <option value="nameDesc">Name (Z-A)</option>
+            </select>
+          </div>
 
-            {/* Filter by Rating */}
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Rating</h3>
-              <select
-                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
-                onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
-              >
-                <option value="All">All</option>
-                <option value="9+">9+</option>
-                <option value="8+">8+</option>
-                <option value="7+">7+</option>
-              </select>
-            </div>
+          {/* Filter button */}
+          <button
+            className="p-2 rounded text-white bg-yellow-400 hover:bg-yellow-500"
+            onClick={() => setIsFilterOpen(true)}
+          >
+            Filter
+          </button>
+        </div>
 
-            {/* Filter by User Rating */}
-            <div>
-              <h3 className="text-lg font-semibold mb-2">User Rating</h3>
-              <select
-                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
-                onChange={(e) => setFilters({ ...filters, userRating: e.target.value })}
-              >
-                <option value="All">All</option>
-                <option value="5 stars">5 Stars</option>
-                <option value="4 stars">4 Stars</option>
-                <option value="3 stars">3 Stars</option>
-              </select>
-            </div>
+        {/* Active Filters */}
+<div className="px-4 mb-8 flex flex-wrap gap-2">
+  {filterOptions.genre && (
+    <div className="flex items-center bg-white shadow px-3 py-1 rounded-full text-sm">
+      <span>{filterOptions.genre}</span>
+      <button
+        onClick={() => setFilterOptions({ ...filterOptions, genre: "" })}
+        className="ml-2 text-gray-500 hover:text-gray-800 font-bold"
+      >
+        ×
+      </button>
+    </div>
+  )}
+  {filterOptions.releaseYear && (
+    <div className="flex items-center bg-white shadow px-3 py-1 rounded-full text-sm">
+      <span>{filterOptions.releaseYear}</span>
+      <button
+        onClick={() => setFilterOptions({ ...filterOptions, releaseYear: "" })}
+        className="ml-2 text-gray-500 hover:text-gray-800 font-bold"
+      >
+        ×
+      </button>
+    </div>
+  )}
+  {filterOptions.rating && (
+    <div className="flex items-center bg-white shadow px-3 py-1 rounded-full text-sm">
+      <span>{filterOptions.rating}+</span>
+      <button
+        onClick={() => setFilterOptions({ ...filterOptions, rating: "" })}
+        className="ml-2 text-gray-500 hover:text-gray-800 font-bold"
+      >
+        ×
+      </button>
+    </div>
+  )}
 
-            {/* Filter by Release Year */}
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Release Year</h3>
-              <select
-                className="w-full p-2 border border-white dark:border-gray-700 rounded-md bg-background text-foreground"
-                onChange={(e) => setFilters({ ...filters, releaseYear: e.target.value })}
+  {/* Clear All */}
+  {(filterOptions.genre || filterOptions.releaseYear || filterOptions.rating) && (
+    <button
+      onClick={() => setFilterOptions({ genre: "", releaseYear: "", rating: "" })}
+      className="bg-red-500 text-white px-3 py-1 rounded-full text-sm hover:bg-red-600"
+    >
+      Clear All
+    </button>
+  )}
+</div>
+
+        {/* Filter Modal */}
+        {isFilterOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md relative">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+                onClick={() => setIsFilterOpen(false)}
               >
-                <option value="All">All</option>
-                <option value="2020s">2020s</option>
-                <option value="2010s">2010s</option>
-                <option value="2000s">2000s</option>
-                <option value="1990s">1990s</option>
-              </select>
+                ✕
+              </button>
+              <h3 className="text-lg font-bold mb-4">Filter Options</h3>
+
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="block font-semibold mb-1">Genre:</label>
+                  <select
+                    className="w-full border rounded p-1"
+                    value={filterOptions.genre}
+                    onChange={(e) => setFilterOptions({...filterOptions, genre: e.target.value})}
+                  >
+                    <option value="">All</option>
+                    <option value="Action">Action</option>
+                    <option value="Sci-Fi">Sci-Fi</option>
+                    <option value="Romance">Romance</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">Release Year:</label>
+                  <select
+                    className="w-full border rounded p-1"
+                    value={filterOptions.releaseYear}
+                    onChange={(e) => setFilterOptions({...filterOptions, releaseYear: e.target.value})}
+                  >
+                    <option value="">All</option>
+                    <option value="2020s">2020s</option>
+                    <option value="2010s">2010s</option>
+                    <option value="2000s">2000s</option>
+                    <option value="1990s">1990s</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">Rating:</label>
+                  <select
+                    className="w-full border rounded p-1"
+                    value={filterOptions.rating}
+                    onChange={(e) => setFilterOptions({...filterOptions, rating: e.target.value})}
+                  >
+                    <option value="">All</option>
+                    <option value="9">9+</option>
+                    <option value="8">8+</option>
+                    <option value="7">7+</option>
+                  </select>
+                </div>
+                <button
+                  className="bg-yellow-400 text-white py-2 px-4 rounded hover:bg-yellow-500"
+                  onClick={() => setIsFilterOpen(false)}
+                >
+                  Apply Filters
+                </button>
+              </div>
             </div>
           </div>
-        </section>
+        )}
 
-        {/* Movies Section */}
-        {/* Movies Section */}
+        {/* Movies Grid */}
         <section className="mb-8 px-4">
-          <h2 className="text-2xl font-bold mb-4">Recommended Movies</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {movies.map((movie) => (
-              <div
-                key={movie.id}
-                className="bg-background rounded-lg overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105"
-              >
-                {/* Link samo za sliku i informacije */}
+            {filteredMovies.map((movie) => (
+              <div key={movie.id} className="bg-background rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-105 transition-transform">
                 <Link href={`/Movies/${movie.id}`} className="flex flex-col flex-1">
                   <div className="relative w-full aspect-[2/3]">
-                    <Image
-                      src={movie.image}
-                      alt={movie.title}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      className="w-full h-full"
-                      unoptimized
-                    />
+                    <Image src={movie.image} alt={movie.title} fill style={{ objectFit: "cover" }} className="w-full h-full" unoptimized />
                   </div>
                   <div className="p-2 flex flex-col flex-1">
                     <h3 className="text-sm font-bold mb-1">{movie.title}</h3>
@@ -226,11 +263,9 @@ export default function Movies() {
                     <p className="text-xs text-gray-500 dark:text-gray-400">Year: {movie.release_year}</p>
                   </div>
                 </Link>
-
-                {/* Dugme izvan Linka */}
                 <div className="p-2">
                   <button
-                    onClick={() => addToWatchlist(movie, "movie")}
+                    onClick={() => addToWatchlist(movie)}
                     className="bg-yellow-400 text-white py-1 px-2 rounded hover:bg-yellow-500 w-full text-sm"
                   >
                     Add
@@ -241,10 +276,8 @@ export default function Movies() {
           </div>
         </section>
 
-
-        {/* Footer Section */}
         <Footer />
-        </div>
+      </div>
     </div>
   );
 }

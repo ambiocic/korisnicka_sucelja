@@ -220,12 +220,12 @@ export default function Dashboard() {
             <span>▼</span>
           </div>
 
-          {/* Wishlist Card */}
+          {/* Watchlist Card */}
           <div
             className="bg-white/10 dark:bg-gray-700/20 text-foreground rounded-lg p-4 shadow-md cursor-pointer flex justify-between items-center hover:bg-gray-400/20 transition-colors w-full"
             onClick={() => setShowWishlist(!showWishlist)}
           >
-            <h2 className="text-lg font-semibold">Wishlist</h2>
+            <h2 className="text-lg font-semibold">Watchlist</h2>
             <span className={`transform transition-transform duration-300 ${showWishlist ? "rotate-180" : ""}`}>
               ▼
             </span>
