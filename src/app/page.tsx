@@ -102,7 +102,7 @@ export default function Home() {
       </div>
 
       {/* Info floating desno */}
-      <div className="md:w-2/5 w-full p-6 md:p-8 flex flex-col justify-between bg-white relative z-10">
+      <div className="bg-background md:w-2/5 w-full p-6 md:p-8 flex flex-col justify-between relative z-10">
         <div>
           <h3 className="text-3xl font-extrabold mb-2 md:mb-3 group-hover:text-yellow-500 transition-colors">
             {item.title}
@@ -125,26 +125,26 @@ export default function Home() {
   );
 
   return (
-    <div className="bg-white text-gray-900 min-h-screen">
+    <div className="bg-background text-gray-900 min-h-screen">
       <Navigation />
-      <div className="mt-24 mx-4 md:mx-8">
+      <div className="mt-28 mx-4 md:mx-8">
 
         {/* Hero Section */}
         <div className="relative w-full flex flex-col items-start justify-center py-8 md:py-12 px-4 md:px-6 mb-10 animate-fadeIn">
           <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-3 leading-tight md:leading-snug tracking-tight">
             <span className="text-yellow-500 drop-shadow-md">Film</span>
-            <span className="text-gray-900 drop-shadow-sm ml-1">Nest</span>
+            <span className="text-white drop-shadow-sm ml-1">Nest</span>
           </h1>
-          <p className="text-gray-600 font-medium text-lg md:text-xl max-w-xl mt-2">
+          <p className="text-gray-300 font-medium text-lg md:text-xl max-w-xl mt-2">
             Discover your next favorite movie or TV show!
           </p>
           {/* Subtle animated gray overlay */}
-          <div className="absolute inset-0 bg-gray-200 opacity-10 rounded-xl animate-pulse-slow pointer-events-none z-0" />
+          <div className="absolute inset-0 bg-gray-800 opacity-10 rounded-xl animate-pulse-slow pointer-events-none z-0" />
         </div>
 
         {/* Recommended Movies */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-8 px-2 md:px-4">Recommended Movies</h2>
+          <h2 className="text-white text-3xl font-bold mb-8 px-2 md:px-4">Recommended Movies</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 px-2 md:px-0">
             {movies.map((movie) => (
               <MediaCard key={movie.id} item={movie} type="movie" />
@@ -154,7 +154,7 @@ export default function Home() {
 
         {/* Trending TV Shows */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-8 px-2 md:px-4">Trending TV Shows</h2>
+          <h2 className="text-white text-3xl font-bold mb-8 px-2 md:px-4">Trending TV Shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 px-2 md:px-0">
             {tvShows.map((tvShow) => (
               <MediaCard key={tvShow.id} item={tvShow} type="tv_show" />

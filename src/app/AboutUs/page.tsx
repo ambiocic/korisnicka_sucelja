@@ -2,50 +2,58 @@
 
 import { Navigation } from "../components/Navigation";  
 import { Footer } from "../components/footer";
+import Image from "next/image";
 
 export default function AboutUs() {
+  const team = [
+    { name: "Alice Johnson", role: "Frontend Developer", image: "/team/alice.jpg" },
+    { name: "Bob Smith", role: "Backend Developer", image: "/team/bob.jpg" },
+    { name: "Catherine Lee", role: "Designer", image: "/team/catherine.jpg" },
+  ];
+
   return (
-    <div className="bg-background dark:bg-gray-900 text-foreground dark:text-white min-h-screen">
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
       {/* Navigation Bar */}
       <Navigation />
 
-      {/* Page Content */}
-      <div className="mt-32 mx-4">
-        {/* Hero Section */}
-        <div className="relative bg-cover bg-center h-64 mb-8 mx-4 mt-24">
-          <div className="absolute border rounded-lg inset-0 bg-background dark:bg-gray-800 shadow-lg flex flex-col justify-center items-start p-6">
-            <h1 className="text-foreground dark:text-white text-3xl md:text-5xl font-extrabold mb-4">
-              About <span className="text-yellow-400">Us</span>
-            </h1>
-            <p className="text-gray-500 dark:text-gray-300 text-lg">
-              Learn more about FilmNest and the team behind it!
-            </p>
-          </div>
-        </div>
+      {/* Hero Section */}
+      <div className="relative bg-cover bg-center h-64 mb-12 mx-4 mt-28 rounded-lg overflow-hidden shadow-lg">
+        <div className="relative w-full flex flex-col items-start justify-center py-8 md:py-12 px-4 md:px-6 mb-10 animate-fadeIn">
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-3 leading-tight md:leading-snug tracking-tight">
+            About <span className="text-yellow-400">Us</span>
+          </h1>
+          <p className="text-gray-700 dark:text-gray-300 text-lg">
+            Learn more about FilmNest and the team behind it!
+          </p>
+                    <div className="absolute inset-0 bg-gray-800 opacity-10 rounded-xl animate-pulse-slow pointer-events-none z-0" />
 
-        {/* About Section */}
-        <section className="max-w-4xl mx-auto mb-16 px-4">
-          <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            FilmNest is a passionate community of movie and TV show enthusiasts.
-            Our mission is to help viewers discover, track, and enjoy the best
-            content from around the world. Whether you’re looking for the latest
-            blockbuster or a hidden gem, FilmNest has you covered.
-          </p>
-          <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            Our team is composed of dedicated developers, designers, and film
-            lovers who share a common goal: to create a seamless experience for
-            discovering and enjoying media. We believe that great stories deserve
-            to be seen, and our platform is here to make that possible.
-          </p>
-          <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            Join our community today and start exploring! Keep track of your
-            favorites, get recommendations, and never miss out on the shows and
-            movies you love.
-          </p>
-        </section>
+        </div>
       </div>
 
-      {/* Footer Section */}
+      {/* About Section */}
+      <section className="max-w-4xl mx-auto mb-16 px-4 space-y-6 text-lg text-gray-700 dark:text-gray-300">
+        <p>
+          FilmNest is a passionate community of movie and TV show enthusiasts.
+          Our mission is to help viewers discover, track, and enjoy the best
+          content from around the world. Whether you’re looking for the latest
+          blockbuster or a hidden gem, FilmNest has you covered.
+        </p>
+        <p>
+          Our team is composed of dedicated developers, designers, and film
+          lovers who share a common goal: to create a seamless experience for
+          discovering and enjoying media. We believe that great stories deserve
+          to be seen, and our platform is here to make that possible.
+        </p>
+        <p>
+          Join our community today and start exploring! Keep track of your
+          favorites, get recommendations, and never miss out on the shows and
+          movies you love.
+        </p>
+      </section>
+
+     
+
+      {/* Footer */}
       <Footer />
     </div>
   );

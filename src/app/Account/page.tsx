@@ -11,128 +11,154 @@ export default function AccountPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState(""); // <-- novo polje
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
 
     if (activeTab === "login") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return setError(error.message);
+      if (error) {
+        setError(error.message === "Invalid login credentials" ? "Invalid email or password." : error.message);
+        return;
+      }
       router.push("/Account/dashboard");
     } else {
       if (password !== confirmPassword) {
-        return setError("Passwords do not match!");
+        setError("Passwords do not match!");
+        return;
       }
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { username } // <-- pohrani username u metadata
-        },
-      });
-      if (error) return setError(error.message);
-      alert("Check your email for registration confirmation!");
+      if (password.length < 6) {
+        setError("Password must be at least 6 characters.");
+        return;
+      }
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setError(
+          error.message.includes("User already registered")
+            ? "This email is already registered."
+            : error.message
+        );
+        return;
+      }
+      setSuccess("Check your email for confirmation!");
       setActiveTab("login");
-      router.push("/Account/dashboard");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Navigation />
-      <div className="flex-grow flex items-center justify-center p-6 mt-24">
-        <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md border border-gray-200 animate-fadeIn">
-          <div className="flex justify-between mb-6">
+      <div className="flex-grow flex items-center justify-center p-6 mt-20">
+        <div className="m-28 bg-white/90 dark:bg-gray-900/40 dark:backdrop-blur-sm shadow-md rounded-lg p-8 w-full max-w-md border border-gray-200 dark:border-gray-700 animate-fadeIn">
+          {/* Tabs */}
+          <div className="flex justify-between mb-6 gap-2">
             <button
               onClick={() => setActiveTab("login")}
-              className={`flex-1 py-3 px-4 text-lg font-bold rounded-t-lg transition-colors ${
+              className={`flex-1 py-3 px-4 text-lg font-semibold rounded-lg transition-all duration-300 ${
                 activeTab === "login"
-                  ? "bg-yellow-400 text-gray-900"
-                  : "bg-gray-200 text-gray-900 hover:bg-gray-300"
+                  ? "bg-yellow-400/20 text-yellow-400 border-b-2 border-yellow-400"
+                  : "bg-gray-200 dark:bg-gray-800/20 text-gray-900 dark:text-gray-100 hover:bg-yellow-400/20 hover:text-yellow-400"
               }`}
             >
-              Login
+              Log In
             </button>
             <button
               onClick={() => setActiveTab("register")}
-              className={`flex-1 py-3 px-4 text-lg font-bold rounded-t-lg transition-colors ${
+              className={`flex-1 py-3 px-4 text-lg font-semibold rounded-lg transition-all duration-300 ${
                 activeTab === "register"
-                  ? "bg-yellow-400 text-gray-900"
-                  : "bg-gray-200 text-gray-900 hover:bg-gray-300"
+                  ? "bg-yellow-400/20 text-yellow-400 border-b-2 border-yellow-400"
+                  : "bg-gray-200 dark:bg-gray-800/20 text-gray-900 dark:text-gray-100 hover:bg-yellow-400/20 hover:text-yellow-400"
               }`}
             >
               Register
             </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            {error && <p className="text-red-500 font-semibold mb-4 text-center">{error}</p>}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error/Success Messages */}
+            {error && (
+              <p className="text-red-500 font-semibold text-center bg-red-100/50 rounded-lg p-3">
+                {error}
+              </p>
+            )}
+            {success && (
+              <p className="text-green-500 font-semibold text-center bg-green-100/50 rounded-lg p-3">
+                {success}
+              </p>
+            )}
 
-            {activeTab === "register" && (
-              <div className="relative mb-4">
-                <label className="block text-sm mb-2">Username</label>
+            {/* Email */}
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                Email
+              </label>
+              <div className="relative">
+                <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
-                  type="text"
-                  placeholder="Enter your username"
-                  className="border bg-gray-50 text-foreground p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-foreground focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
-            )}
-
-            <div className="relative mb-4">
-              <FaEnvelope className="absolute left-3 top-11 text-gray-400" />
-              <label className="block text-sm mb-2">Email</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="border bg-gray-50 text-foreground p-3 pl-10 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
             </div>
 
-            <div className="relative mb-4">
-              <FaLock className="absolute left-3 top-11 text-gray-400" />
-              <label className="block text-sm mb-2">Password</label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className="border bg-gray-50 text-foreground p-3 pl-10 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {activeTab === "register" && (
-              <div className="relative mb-4">
-                <FaLock className="absolute left-3 top-11 text-gray-400" />
-                <label className="block text-sm mb-2">Confirm Password</label>
+            {/* Password */}
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                Password
+              </label>
+              <div className="relative">
+                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="password"
-                  placeholder="Confirm your password"
-                  className="border bg-gray-50 text-foreground p-3 pl-10 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-foreground focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
+            </div>
+
+            {/* Confirm Password (Register only) */}
+            {activeTab === "register" && (
+              <div className="relative">
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="password"
+                    placeholder="Confirm your password"
+                    className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-foreground focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
             )}
 
+            {/* Submit Button */}
             <button
               type="submit"
-              className="bg-yellow-400 text-gray-900 px-4 py-3 rounded-lg w-full font-bold hover:bg-yellow-500 transition-colors"
+              className="w-full bg-yellow-400 text-gray-900 px-4 py-3 rounded-lg font-semibold shadow-md hover:bg-yellow-500 hover:scale-105 transition-all duration-300"
             >
-              {activeTab === "login" ? "Log in" : "Register"}
+              {activeTab === "login" ? "Log In" : "Register"}
             </button>
           </form>
         </div>

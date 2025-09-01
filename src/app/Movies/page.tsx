@@ -151,7 +151,7 @@ export default function Movies() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       <Navigation />
-      <div className="mt-32 mx-4">
+      <div className="mt-28 mx-4">
         {/* Hero */}
         
 
@@ -165,7 +165,7 @@ export default function Movies() {
           ].map((option) => (
             <button
               key={option.value}
-              className={`px-4 py-2 rounded-full font-semibold transition ${
+              className={`px-4 py-2 rounded-lg font-semibold transition ${
                 sortBy === option.value
                   ? "bg-yellow-400 text-white shadow-lg"
                   : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-300"
@@ -177,7 +177,7 @@ export default function Movies() {
           ))}
           <button
             onClick={() => setIsFilterOpen(true)}
-            className="ml-auto px-4 py-2 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white shadow transition"
+            className="ml-auto px-4 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow transition"
           >
             Filters
           </button>
@@ -191,7 +191,7 @@ export default function Movies() {
               <button
                 key={g}
                 onClick={() => toggleGenre(g)}
-                className="bg-yellow-400 text-white px-3 py-1 rounded-full shadow hover:bg-yellow-500 text-sm"
+                className="bg-yellow-400 text-white px-3 py-1 rounded-lg shadow hover:bg-yellow-500 text-sm"
               >
                 {g} ✕
               </button>
@@ -205,7 +205,7 @@ export default function Movies() {
                     releaseYear: [minYear, maxYear],
                   })
                 }
-                className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full shadow text-sm"
+                className="bg-blue-200 text-blue-800 px-3 py-1 rounded-lg shadow text-sm"
               >
                 Year: {filterOptions.releaseYear[0]} -{" "}
                 {filterOptions.releaseYear[1]} ✕
@@ -216,7 +216,7 @@ export default function Movies() {
                 onClick={() =>
                   setFilterOptions({ ...filterOptions, rating: [0, 10] })
                 }
-                className="bg-green-200 text-green-800 px-3 py-1 rounded-full shadow text-sm"
+                className="bg-green-200 text-green-800 px-3 py-1 rounded-lg shadow text-sm"
               >
                 Rating: {filterOptions.rating[0].toFixed(1)} -{" "}
                 {filterOptions.rating[1].toFixed(1)} ✕
@@ -225,7 +225,7 @@ export default function Movies() {
                       {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="px-4 py-2 rounded-full bg-red-500 hover:bg-red-600 text-white shadow transition"
+              className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white shadow transition"
             >
               Clear All ✕
             </button>
@@ -254,7 +254,7 @@ export default function Movies() {
                   {genres.map((g) => (
                     <button
                       key={g}
-                      className={`px-4 py-1 rounded-full whitespace-nowrap ${
+                      className={`px-4 py-1 rounded-lg whitespace-nowrap ${
                         filterOptions.genres.includes(g)
                           ? "bg-yellow-400 text-white shadow"
                           : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-300"
@@ -331,7 +331,7 @@ export default function Movies() {
 
               <button
                 onClick={() => setIsFilterOpen(false)}
-                className="w-full py-2 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold"
+                className="w-full py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white font-semibold"
               >
                 Apply Filters
               </button>
@@ -372,9 +372,9 @@ export default function Movies() {
                 <div className="p-2">
                   <button
                     onClick={() => addToWatchlist(movie)}
-                    className="bg-yellow-400 text-white py-1 px-2 rounded hover:bg-yellow-500 w-full text-sm"
+                    className="bg-yellow-400 text-white py-1 px-2 rounded hover:bg-yellow-500 w-full "
                   >
-                    Add
+                    Add to Watchlist
                   </button>
                 </div>
               </div>

@@ -232,25 +232,29 @@ export default function Dashboard() {
       `}</style>
       <Navigation />
 
-      <main className="px-6 md:px-12 mt-24 flex-1 w-full mx-auto space-y-8 pb-24">
+      <main className="px-6 md:px-12 mt-28 flex-1 w-full mx-auto space-y-8 pb-24">
         {/* Welcome / Stats */}
-        <div className="bg-white/90 dark:bg-gray-100/90 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+        <div className="rounded-2xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 w-full">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold">
               Welcome, <span className="text-yellow-400">{user?.email?.split("@")[0]}</span>
             </h1>
             <p className="text-gray-500 dark:text-gray-600 mt-1">Here’s your personal dashboard.</p>
           </div>
+          
           <div className="flex gap-6">
             <div className="text-center">
               <p className="font-bold text-xl">{watchlist.length}</p>
               <p className="text-sm text-gray-400">Watchlist</p>
             </div>
+          
             <div className="text-center">
               <p className="font-bold text-xl">{reviews.length}</p>
               <p className="text-sm text-gray-400">Reviews</p>
             </div>
+            
           </div>
+        
         </div>
 
         {/* Message for Change Password */}
@@ -324,12 +328,12 @@ export default function Dashboard() {
         )}
 
         {/* Horizontal Tabs */}
-        <div className="flex gap-4 border-b border-gray-300 dark:border-gray-700 w-full">
+        <div className="flex gap-4  dark:border-gray-700 w-full">
           {["account", "watchlist", "reviews"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-2 rounded-t-lg font-semibold transition-colors ${
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 activeTab === tab
                   ? "bg-yellow-400 text-black shadow"
                   : "bg-white/10 dark:bg-gray-700/20 text-foreground hover:bg-gray-400/20"
@@ -345,7 +349,7 @@ export default function Dashboard() {
           {/* Account */}
           {activeTab === "account" && user && (
             <div className="w-full">
-              <div className="bg-white/90 dark:bg-gray-100/90 p-6 rounded-xl shadow-md space-y-3 w-full">
+              <div className="bg-white/90 dark:bg-gray-900/40 p-6 rounded-xl shadow-md space-y-3 w-full">
                 <p><strong>Username:</strong> {user.email?.split("@")[0]}</p>
                 <p><strong>Email:</strong> {user.email}</p>
                 <p>
@@ -376,7 +380,7 @@ export default function Dashboard() {
           {activeTab === "watchlist" && (
             <div className="w-full relative">
               {watchlist.length === 0 ? (
-                <div className="bg-white/90 dark:bg-gray-100/90 p-6 rounded-xl shadow-md text-gray-500 dark:text-gray-600 w-full text-center">
+                <div className="bg-white/90 dark:bg-gray-900/40 p-6 rounded-xl shadow-md text-gray-500 dark:text-gray-600 w-full text-center">
                   Your watchlist is empty.
                 </div>
               ) : (
@@ -407,7 +411,7 @@ export default function Dashboard() {
                       return (
                         <div
                           key={item.id}
-                          className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-gray-100/90 rounded-xl shadow-md hover:shadow-2xl transition-transform hover:scale-105 relative overflow-visible group"
+                          className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-gray-900/40 rounded-xl shadow-md hover:shadow-2xl transition-transform hover:scale-105 relative overflow-visible group"
                         >
                           <Link href={link} className="flex flex-col">
                             <div className="relative w-full aspect-[2/3]">
@@ -430,7 +434,7 @@ export default function Dashboard() {
                           </Link>
                           <button
                             onClick={() => removeFromWatchlist(item.id)}
-                            className="w-full py-1 bg-red-500 text-white text-xs hover:bg-red-600 transition-colors rounded-b-xl"
+                            className="absolute bottom-4 right-2 bg-red-500 text-white p-1 rounded-lg shadow-md text-sm  hover:bg-red-600 transition-opacity"
                           >
                             Remove
                           </button>
@@ -447,7 +451,7 @@ export default function Dashboard() {
           {activeTab === "reviews" && (
             <div className="w-full relative">
               {reviews.length === 0 ? (
-                <div className="bg-white/90 dark:bg-gray-100/90 p-6 rounded-xl shadow-md text-gray-500 dark:text-gray-600 w-full text-center">
+                <div className="bg-white/90 dark:bg-gray-900/40 p-6 rounded-xl shadow-md text-gray-500 dark:text-gray-600 w-full text-center">
                   You have not written any reviews yet.
                 </div>
               ) : (
