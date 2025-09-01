@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   --background: #ffffff; /* Light mode background */
   --foreground: #171717; /* Light mode text color */
@@ -25,15 +26,29 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
-/* Skrivanje skrol bara */
-.scrollbar-hidden::-webkit-scrollbar {
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 10s ease infinite;
+}
+
+@keyframes streak-slow {
+  0% { transform: translateY(-100%) rotate(15deg); }
+  100% { transform: translateY(100%) rotate(15deg); }
+}
+.animate-streak-slow {
+  animation: streak-slow 20s linear infinite;
+}
+
+
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
-.scrollbar-hidden {
-  -ms-overflow-style: none;  /* Za Internet Explorer 10+ */
-  scrollbar-width: none;      /* Za Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

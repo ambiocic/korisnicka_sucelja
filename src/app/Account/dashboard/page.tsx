@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
@@ -41,29 +41,108 @@ export default function Dashboard() {
   };
 
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
-  const [user, setUser] = useState<User | null>(null);
-  // Removed unused loading state
-  const [showAccountDetails, setShowAccountDetails] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showWishlist, setShowWishlist] = useState(false);
-  const [showReviews, setShowReviews] = useState(false);
-  const [showChangePassword, setShowChangePassword] = useState(false);
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [activeTab, setActiveTab] = useState<"account" | "watchlist" | "reviews">("account");
+  const [showModal, setShowModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
 
-  // Fetch logged-in user
+  // Refs for scrollable containers
+  const watchlistRef = useRef<HTMLDivElement>(null);
+  const reviewsRef = useRef<HTMLDivElement>(null);
+
+  // State for overflow
+  const [watchlistOverflow, setWatchlistOverflow] = useState(false);
+  const [reviewsOverflow, setReviewsOverflow] = useState(false);
+
+  // Check overflow for arrows
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (watchlistRef.current) {
+        setWatchlistOverflow(watchlistRef.current.scrollWidth > watchlistRef.current.clientWidth);
+      }
+      if (reviewsRef.current) {
+        setReviewsOverflow(reviewsRef.current.scrollWidth > reviewsRef.current.clientWidth);
+      }
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [watchlist, reviews]);
+
+  // Scroll handlers
+  const scrollLeft = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: -200, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: 200, behavior: "smooth" });
+    }
+  };
+
+  // Change Password handler
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setMessage(null);
+    setLoading(true);
+
+    // Validate inputs
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setMessage("All fields are required.");
+      setLoading(false);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setMessage("New passwords do not match.");
+      setLoading(false);
+      return;
+    }
+    if (newPassword.length < 6) {
+      setMessage("New password must be at least 6 characters.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Verify old password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email!,
+        password: oldPassword,
+      });
+      if (signInError) {
+        setMessage("Incorrect old password.");
+        setLoading(false);
+        return;
+      }
+
+      // Update password
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) throw updateError;
+
+      setMessage("Password updated successfully!");
+      setShowModal(false);
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      setMessage("Error updating password: " + (error as Error).message);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       setLoading(true);
-       // Show a loading spinner while data is being fetched
-      if (loading) {
-        return (
-          <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-yellow-400"></div>
-          </div>
-        );
-      }
       const { data, error } = await supabase.auth.getUser();
       if (error || !data.user) {
         router.push("/Account");
@@ -75,7 +154,6 @@ export default function Dashboard() {
     fetchUser();
   }, [router]);
 
-  // Fetch watchlist
   const fetchWatchlist = async () => {
     if (!user) return;
     setLoading(true);
@@ -91,12 +169,8 @@ export default function Dashboard() {
       .eq("user_id", user.id)
       .order("id", { ascending: false }) as { data: WatchlistItem[] | null; error: Error | null };
 
-    if (error) {
-      console.error("Error fetching watchlist:", error);
-      alert("Failed to fetch watchlist. Please try again.");
-    } else if (data) {
-      setWatchlist(data);
-    }
+    if (error) console.error(error);
+    else if (data) setWatchlist(data);
     setLoading(false);
   };
 
@@ -108,334 +182,327 @@ export default function Dashboard() {
       .select(`*, movies(*), tv_shows(*)`)
       .eq("user_id", user.id)
       .order("id", { ascending: false });
-    if (error) {
-      console.error("Error fetching reviews:", error);
-      alert("Failed to fetch reviews. Please try again.");
-    } else if (data) {
+    if (error) console.error(error);
+    else if (data) {
       const formattedData = data.map((review) => ({
         ...review,
         media_type: review.movie_id ? "movie" : "tv_show",
       }));
       setReviews(formattedData);
-
     }
-    console.log(data);
     setLoading(false);
   };
 
-      // Remove from watchlist
   const removeFromWatchlist = async (id: number) => {
     setLoading(true);
     const { error } = await supabase.from("watchlist").delete().eq("id", id);
-    if (error) {
-      console.error("Error removing from watchlist:", error);
-      alert("Failed to remove item from watchlist.");
-    } else {
-      fetchWatchlist();
-    }
+    if (error) console.error(error);
+    else fetchWatchlist();
     setLoading(false);
   };
 
-  useEffect(() => {
-    if (user) fetchWatchlist();
-  }, [user]);
+  const deleteAccount = async () => {
+    if (!user) return;
+    await supabase.from("watchlist").delete().eq("user_id", user.id);
+    await supabase.from("reviews").delete().eq("user_id", user.id);
+    const { error } = await supabase.auth.admin.deleteUser(user.id);
+    if (!error) router.push("/Account");
+  };
 
   useEffect(() => {
-    if (user) fetchReviews();
+    if (user) {
+      fetchWatchlist();
+      fetchReviews();
+    }
   }, [user]);
 
-  // Separate movies and tv shows
   const watchlistMovies = watchlist.filter((item) => item.movie_id);
   const watchlistTVShows = watchlist.filter((item) => item.tv_show_id);
 
-  // Delete account
-  const deleteAccount = async () => {
-    if (!user) return;
-
-    // Optional: delete related user data
-    await supabase.from("watchlist").delete().eq("user_id", user.id);
-    await supabase.from("reviews").delete().eq("user_id", user.id);
-
-    // Delete user
-    const { error } = await supabase.auth.admin.deleteUser(user.id);
-
-    if (error) {
-      console.error("Error deleting account:", error);
-      alert("Failed to delete account. Please try again.");
-    } else {
-      alert("Your account has been deleted.");
-      router.push("/Account");
-    }
-  };
-
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
+      <style jsx global>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
       <Navigation />
 
-      <div className="mt-32 mx-4">
-        {/* Hero / Welcome Section */}
-        <div className="relative bg-cover bg-center h-64 mb-4 mx-4 mt-24">
-          <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 rounded-lg shadow-lg flex flex-col justify-center items-start p-6 md:px-16">
-            <h1 className="text-foreground text-3xl md:text-5xl font-extrabold mb-4">
-              Welcome, <span className="text-yellow-400">{user?.email?.split("@")[0] || "Korisnik"}</span>
+      <main className="px-6 md:px-12 mt-24 flex-1 w-full mx-auto space-y-8 pb-24">
+        {/* Welcome / Stats */}
+        <div className="bg-white/90 dark:bg-gray-100/90 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold">
+              Welcome, <span className="text-yellow-400">{user?.email?.split("@")[0]}</span>
             </h1>
-            <p className="text-gray-500 dark:text-gray-300 text-lg">
-              Here’s your personal dashboard. Check your watchlist or explore new movies and TV shows!
-            </p>
+            <p className="text-gray-500 dark:text-gray-600 mt-1">Here’s your personal dashboard.</p>
+          </div>
+          <div className="flex gap-6">
+            <div className="text-center">
+              <p className="font-bold text-xl">{watchlist.length}</p>
+              <p className="text-sm text-gray-400">Watchlist</p>
+            </div>
+            <div className="text-center">
+              <p className="font-bold text-xl">{reviews.length}</p>
+              <p className="text-sm text-gray-400">Reviews</p>
+            </div>
           </div>
         </div>
 
-        {/* Action Cards */}
-        <div className="flex flex-col gap-4 px-4">
-          {/* Account Card */}
-          <div
-            className="bg-white/10 dark:bg-gray-700/20 text-foreground rounded-lg p-4 shadow-md cursor-pointer flex justify-between items-center hover:bg-gray-400/20 transition-colors w-full"
-            onClick={() => setShowAccountDetails(!showAccountDetails)}
-          >
-            <h2 className="text-lg font-semibold">Account</h2>
-            <span className={`transform transition-transform duration-300 ${showAccountDetails ? "rotate-180" : ""}`}>
-              ▼
-            </span>
+        {/* Message for Change Password */}
+        {message && (
+          <div className={`p-4 rounded-lg text-center w-full ${message.includes("Error") ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+            {message}
           </div>
+        )}
 
-          {showAccountDetails && user && (
-            <div className="bg-white/5 dark:bg-gray-800/20 rounded-lg p-4 mt-2 border border-gray-300 dark:border-gray-700 space-y-4 w-full">
-              <p><strong>Username:</strong> {user.email?.split("@")[0]}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Account Created:</strong> {user.created_at ? new Date(user.created_at).toLocaleString("hr-HR") : "Unknown"}</p>
-
-              <button
-                onClick={() => setShowChangePassword(true)}
-                className="text-yellow-400 hover:underline text-sm"
-              >
-                Change Password
-              </button>
-            </div>
-          )}
-
-          {/* Change Password Popup */}
-          {showChangePassword && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-80 relative shadow-lg">
-                <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl font-bold"
-                  onClick={() => setShowChangePassword(false)}
-                >
-                  ×
-                </button>
-                <h4 className="text-lg font-semibold mb-4">Change Password</h4>
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const newPassword = formData.get("newPassword") as string;
-
-                    if (!newPassword || newPassword.length < 6) {
-                      alert("Password must be at least 6 characters long.");
-                      return;
-                    }
-
-                    const { error } = await supabase.auth.updateUser({ password: newPassword });
-                    if (error) {
-                      console.error("Error changing password:", error);
-                      alert("Failed to change password. Please try again.");
-                    } else {
-                      alert("Password changed successfully!");
-                      e.currentTarget.reset();
-                      setShowChangePassword(false);
-                    }
-                  }}
-                  className="flex flex-col gap-2"
-                >
+        {/* Change Password Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white/90 dark:bg-gray-100/90 p-6 rounded-xl shadow-lg w-full max-w-md">
+              <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Old Password</label>
                   <input
                     type="password"
-                    name="newPassword"
-                    placeholder="New password"
-                    className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-background text-foreground"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    required
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="mt-1 w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    required
+                  />
+                </div>
+                <div className="flex gap-4">
                   <button
                     type="submit"
-                    className="bg-yellow-400 text-white py-1 px-2 rounded hover:bg-yellow-500 w-full"
+                    disabled={loading}
+                    className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50"
                   >
-                    Change Password
+                    Update Password
                   </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* My Reviews Card */}
-          <div
-            className="bg-white/10 dark:bg-gray-700/20 text-foreground rounded-lg p-4 shadow-md cursor-pointer flex justify-between items-center hover:bg-gray-400/20 transition-colors w-full"
-            onClick={() => setShowReviews(!showReviews)}
-          >
-            <h2 className="text-lg font-semibold">My Reviews</h2>
-            <span>▼</span>
-          </div>
-          {showReviews && (
-            <div className="bg-white/5 dark:bg-gray-800/20 rounded-lg p-4 mt-2 border border-gray-300 dark:border-gray-700 space-y-4 w-full max-h-96 overflow-y-auto">
-              {reviews.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400">You have not written any reviews yet.</p>
-              ) : (
-                reviews.map((review) => (
-                  <div key={review.id} className="border-b border-gray-300 dark:border-gray-700 pb-2 mb-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      <Link href={ review.media_type === "movie" ? `/Movies/${review.movie_id}` : `/TVShows/${review.tv_show_id}`} className="hover:underline">
-                      <strong>{review.media_type === "movie" ? review.movies?.title : review.tv_shows?.title} </strong> </Link>{review.media_type === "movie" ? "Movie" : "TV Show"}
-                    </p>
-                    <p className="text-sm text-yellow-400 mb-1"><strong>Rating:</strong> {review.rating} / 5</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400"><strong>Review:</strong> {review.review_text}</p>
-                  </div>
-                ))
-              )}
-            </div> 
-
-          )}
-
-          {/* Watchlist Card */}
-          <div
-            className="bg-white/10 dark:bg-gray-700/20 text-foreground rounded-lg p-4 shadow-md cursor-pointer flex justify-between items-center hover:bg-gray-400/20 transition-colors w-full"
-            onClick={() => setShowWishlist(!showWishlist)}
-          >
-            <h2 className="text-lg font-semibold">Watchlist</h2>
-            <span className={`transform transition-transform duration-300 ${showWishlist ? "rotate-180" : ""}`}>
-              ▼
-            </span>
-          </div>
-
-          {showWishlist && (
-            <div className="mt-2 w-full">
-              {/* Movies */}
-              {watchlistMovies.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-md font-bold mb-2">Movies</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {watchlistMovies.map((item) => (
-                      <div
-                        key={item.id}
-                        className="bg-background rounded-lg overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105 w-full"
-                      >
-                        <Link href={`/Movies/${item.movie_id}`} className="flex flex-col flex-1">
-                        <div className="relative w-full aspect-[2/3]">
-                          <Image
-                            src={item.movie?.image || ""}
-                            alt={item.movie?.title || ""}
-                            fill
-                            style={{ objectFit: "cover" }}
-                            className="w-full h-full"
-                            unoptimized
-                          />
-                        </div>
-                        <div className="p-2 flex flex-col flex-1">
-                          <h3 className="text-sm font-bold mb-1 truncate">{item.movie?.title}</h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">{item.movie?.genre}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Year: {item.movie?.release_year}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Rating: {item.movie?.rating}</p>
-                        </div>
-                        </Link>
-                        <div className="p-2">
-                          <button
-                            onClick={() => removeFromWatchlist(item.id)}
-                            className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 w-full text-sm"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* TV Shows */}
-              {watchlistTVShows.length > 0 && (
-                <div>
-                  <h3 className="text-md font-bold mb-2">TV Shows</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {watchlistTVShows.map((item) => (
-                      <div
-                        key={item.id}
-                        className="bg-background rounded-lg overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105 w-full"
-                      >
-                        <Link href={`/TVShows/${item.tv_show_id}`} className="flex flex-col flex-1">
-                        <div className="relative w-full aspect-[2/3]">
-                          <Image
-                            src={item.tv_show?.image || ""}
-                            alt={item.tv_show?.title || ""}
-                            fill
-                            style={{ objectFit: "cover" }}
-                            className="w-full h-full"
-                            unoptimized
-                          />
-                        </div>
-                        <div className="p-2 flex flex-col flex-1">
-                          <h3 className="text-sm font-bold mb-1 truncate">{item.tv_show?.title}</h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">{item.tv_show?.genre}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Year: {item.tv_show?.release_year}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Rating: {item.tv_show?.rating}</p>
-                        </div>
-                        </Link>
-                        <div className="p-2">
-                          <button
-                            onClick={() => removeFromWatchlist(item.id)}
-                            className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 w-full text-sm"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Delete Account Card */}
-          <div
-            className="bg-white/10 dark:bg-gray-700/20 text-red-500 rounded-lg p-4 shadow-md cursor-pointer flex justify-between items-center hover:bg-red-500/20 transition-colors w-full mb-4"
-            onClick={() => setShowDeletePopup(true)}
-          >
-            <h2 className="text-lg font-semibold">Delete My Account</h2>
-            <span className={`transform transition-transform ${showDeletePopup ? "rotate-180" : ""}`}>▼</span>
-          </div>
-
-          {/* Delete Confirmation Popup */}
-          {showDeletePopup && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div className="bg-white dark:bg-gray-100 rounded-2xl p-6 w-80 relative shadow-xl border border-red-500">
-                <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-600 text-xl font-bold"
-                  onClick={() => setShowDeletePopup(false)}
-                >
-                  ×
-                </button>
-                <h4 className="text-lg font-bold mb-4 text-red-500">Confirm Account Deletion</h4>
-                <p className="text-sm mb-4 text-gray-700 dark:text-gray-800">
-                  Are you sure you want to delete your account? This action cannot be undone.
-                </p>
-                <div className="flex justify-between gap-2">
                   <button
-                    onClick={() => setShowDeletePopup(false)}
-                    className="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-800 hover:text-white w-full transition-colors"
+                    type="button"
+                    onClick={() => {
+                      setShowModal(false);
+                      setOldPassword("");
+                      setNewPassword("");
+                      setConfirmPassword("");
+                      setMessage(null);
+                    }}
+                    className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
                   >
                     Cancel
                   </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Horizontal Tabs */}
+        <div className="flex gap-4 border-b border-gray-300 dark:border-gray-700 w-full">
+          {["account", "watchlist", "reviews"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab as any)}
+              className={`px-4 py-2 rounded-t-lg font-semibold transition-colors ${
+                activeTab === tab
+                  ? "bg-yellow-400 text-black shadow"
+                  : "bg-white/10 dark:bg-gray-700/20 text-foreground hover:bg-gray-400/20"
+              }`}
+            >
+              {tab === "account" ? "Account" : tab === "watchlist" ? "Watchlist" : "My Reviews"}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        <div className="mt-4 space-y-6 w-full">
+          {/* Account */}
+          {activeTab === "account" && user && (
+            <div className="w-full">
+              <div className="bg-white/90 dark:bg-gray-100/90 p-6 rounded-xl shadow-md space-y-3 w-full">
+                <p><strong>Username:</strong> {user.email?.split("@")[0]}</p>
+                <p><strong>Email:</strong> {user.email}</p>
+                <p>
+                  <strong>Account Created:</strong>{" "}
+                  {user.created_at ? new Date(user.created_at).toLocaleDateString("en-US") : "Unknown"}
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowModal(true)}
+                    disabled={loading}
+                    className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors mt-4 disabled:opacity-50"
+                  >
+                    Change Password
+                  </button>
                   <button
                     onClick={deleteAccount}
-                    className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 w-full transition-colors"
+                    disabled={loading}
+                    className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors mt-4 disabled:opacity-50"
                   >
-                    Delete
+                    Delete My Account
                   </button>
                 </div>
               </div>
             </div>
           )}
+
+          {/* Watchlist */}
+          {activeTab === "watchlist" && (
+            <div className="w-full relative">
+              {watchlist.length === 0 ? (
+                <div className="bg-white/90 dark:bg-gray-100/90 p-6 rounded-xl shadow-md text-gray-500 dark:text-gray-600 w-full text-center">
+                  Your watchlist is empty.
+                </div>
+              ) : (
+                <>
+                  {watchlistOverflow && (
+                    <>
+                      <button
+                        onClick={() => scrollLeft(watchlistRef)}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                      >
+                        ←
+                      </button>
+                      <button
+                        onClick={() => scrollRight(watchlistRef)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                      >
+                        →
+                      </button>
+                    </>
+                  )}
+                  <div
+                    ref={watchlistRef}
+                    className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 w-full no-scrollbar"
+                  >
+                    {watchlistMovies.concat(watchlistTVShows).map((item) => {
+                      const media = item.movie || item.tv_show;
+                      const link = item.movie ? `/Movies/${item.movie_id}` : `/TVShows/${item.tv_show_id}`;
+                      return (
+                        <div
+                          key={item.id}
+                          className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-gray-100/90 rounded-xl shadow-md hover:shadow-2xl transition-transform hover:scale-105 relative overflow-visible group"
+                        >
+                          <Link href={link} className="flex flex-col">
+                            <div className="relative w-full aspect-[2/3]">
+                              <Image
+                                src={media?.image || ""}
+                                alt={media?.title || ""}
+                                fill
+                                style={{ objectFit: "cover" }}
+                                className="w-full h-full rounded-t-xl"
+                                unoptimized
+                              />
+                             
+                            </div>
+                            <div className="p-3 flex flex-col flex-1">
+                              <h3 className="text-sm md:text-base font-semibold truncate">{media?.title}</h3>
+                              <p className="text-[10px] md:text-sm text-gray-400 mb-1 truncate">{media?.genre}</p>
+                              <p className="text-[10px] md:text-sm text-gray-400">Year: {media?.release_year}</p>
+                              <p className="text-[10px] md:text-sm text-yellow-400">Rating: {media?.rating}</p>
+                            </div>
+                          </Link>
+                          <button
+                            onClick={() => removeFromWatchlist(item.id)}
+                            className="w-full py-1 bg-red-500 text-white text-xs hover:bg-red-600 transition-colors rounded-b-xl"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Reviews */}
+          {activeTab === "reviews" && (
+            <div className="w-full relative">
+              {reviews.length === 0 ? (
+                <div className="bg-white/90 dark:bg-gray-100/90 p-6 rounded-xl shadow-md text-gray-500 dark:text-gray-600 w-full text-center">
+                  You have not written any reviews yet.
+                </div>
+              ) : (
+                <>
+                  {reviewsOverflow && (
+                    <>
+                      <button
+                        onClick={() => scrollLeft(reviewsRef)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                      >
+                        ←
+                      </button>
+                      <button
+                        onClick={() => scrollRight(reviewsRef)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                      >
+                        →
+                      </button>
+                    </>
+                  )}
+                  <div
+                    ref={reviewsRef}
+                    className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 w-full no-scrollbar"
+                  >
+                    {reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-gray-100/90 rounded-xl shadow-md p-4 hover:shadow-2xl transition-transform hover:scale-105 flex flex-col overflow-visible group"
+                      >
+                        <Link
+                          href={review.movie_id ? `/Movies/${review.movie_id}` : `/TVShows/${review.tv_show_id}`}
+                          className="hover:underline font-bold mb-1 text-sm md:text-base truncate"
+                        >
+                          {review.movie_id ? review.movies?.title : review.tv_shows?.title}
+                        </Link>
+                        <p className="text-xs md:text-sm text-gray-400 mb-1">
+                          Type: {review.movie_id ? "Movie" : "TV Show"}
+                        </p>
+                        <p className="text-xs md:text-sm text-yellow-400 mb-2">
+                          <strong>Rating:</strong> {review.rating}/5
+                        </p>
+                        <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 line-clamp-4">
+                          {review.review_text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>
   );
 }
-
