@@ -22,6 +22,7 @@ export default function TVShows() {
     image: string;
     genre: string;
     release_year: number;
+    rating: number;
   };
 
   const [tvShows, setTvShows] = useState<Media[]>([]);
@@ -46,7 +47,7 @@ export default function TVShows() {
   const fetchTvShows = async () => {
     let query = supabase
       .from("tv_shows")
-      .select("id, title, image, genre, release_year")
+      .select("id, title, image, genre, release_year, rating")
       .limit(10);
 
     // Apply genre filter
@@ -222,6 +223,7 @@ export default function TVShows() {
                     <h3 className="text-sm font-bold mb-1">{tvShow.title}</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Year: {tvShow.release_year}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Rating: {tvShow.rating}</p>
                   </div>
                 </Link>
 

@@ -13,6 +13,8 @@ type Media = {
   image: string | null;
   genre: string | null;
   release_year: number | null;
+  description: string | null;
+  rating: number | null;
 };
 
 type Review = {
@@ -31,7 +33,7 @@ type PostProps = {
 async function getTVShowById(id: string): Promise<Media | null> {
   const { data, error } = await supabase
     .from("tv_shows")
-    .select("id, title, image, genre, release_year")
+    .select("id, title, image, genre, release_year, description, rating")
     .eq("id", id)
     .single();
 
@@ -200,10 +202,22 @@ export default function TVShowPage({ params }: PostProps) {
           </div>
         )}
 
+         {/* Movie Info */}
         <div className="flex-1 flex flex-col justify-start">
           <h1 className="text-3xl font-extrabold mb-2">{media.title}</h1>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            Genre: {media.genre || "N/A"} | Release Year: {media.release_year || "N/A"}
+<p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            Genre: {media.genre || "N/A"}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Release Year: {media.release_year || "N/A"}
+          </p>
+          {media.rating !== null && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Rating: {media.rating} ★
+            </p>
+          )}
+          <p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
+            {media.description || "No description available."}
           </p>
         </div>
       </div>

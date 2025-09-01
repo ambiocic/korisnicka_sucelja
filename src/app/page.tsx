@@ -17,6 +17,7 @@ export default function Home() {
     image: string;
     genre: string;
     release_year: number;
+    rating: number;
   };
 
   const [movies, setMovies] = useState<Media[]>([]);
@@ -46,7 +47,7 @@ export default function Home() {
   const fetchMovies = async () => {
     const { data, error } = await supabase
       .from("movies")
-      .select("id, title, image, genre, release_year");
+      .select("id, title, image, genre, release_year, rating");
     if (error) {
       console.error("Error fetching movies:", error);
       alert("Failed to fetch movies: " + (error.message || "Unknown error"));
@@ -60,7 +61,7 @@ export default function Home() {
   const fetchTvShows = async () => {
     const { data, error } = await supabase
       .from("tv_shows")
-      .select("id, title, image, genre, release_year");
+      .select("id, title, image, genre, release_year, rating");
     if (error) {
       console.error("Error fetching TV shows:", error);
       alert("Failed to fetch TV shows: " + (error.message || "Unknown error"));
@@ -163,6 +164,9 @@ export default function Home() {
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Release Year: {movie.release_year}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Rating: {movie.rating}
             </p>
           </div>
         </Link>

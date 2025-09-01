@@ -13,6 +13,8 @@ type Media = {
   image: string | null;
   genre: string | null;
   release_year: number | null;
+  description: string | null;
+  rating: number | null;
 };
 
 type Review = {
@@ -34,7 +36,7 @@ type PostProps = {
 async function getMovieById(id: string): Promise<Media | null> {
   const { data, error } = await supabase
     .from("movies")
-    .select("id, title, image, genre, release_year")
+    .select("id, title, image, genre, release_year, description, rating")
     .eq("id", id)
     .single();
 
@@ -212,8 +214,19 @@ const toggleModal = () => setIsModalOpen(!isModalOpen);
         {/* Movie Info */}
         <div className="flex-1 flex flex-col justify-start">
           <h1 className="text-3xl font-extrabold mb-2">{media.title}</h1>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            This is a placeholder for the movie description. Once added to the database, the description will appear here.
+<p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            Genre: {media.genre || "N/A"}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Release Year: {media.release_year || "N/A"}
+          </p>
+          {media.rating !== null && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Rating: {media.rating} ★
+            </p>
+          )}
+          <p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
+            {media.description || "No description available."}
           </p>
         </div>
       </div>

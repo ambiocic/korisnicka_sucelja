@@ -7,6 +7,7 @@ import { User } from "@supabase/supabase-js";
 import Image from "next/image";
 import { Navigation } from "@/app/components/Navigation";
 import { Footer } from "@/app/components/footer";
+import Link from "next/link";
 
 export default function Dashboard() {
   type Media = {
@@ -15,6 +16,7 @@ export default function Dashboard() {
     image: string;
     genre: string;
     release_year: number;
+    rating: number;
   };
 
   type WatchlistItem = {
@@ -27,11 +29,13 @@ export default function Dashboard() {
 
   const router = useRouter();
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
   // Removed unused loading state
   const [showAccountDetails, setShowAccountDetails] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
@@ -68,8 +72,8 @@ export default function Dashboard() {
         id,
         movie_id,
         tv_show_id,
-        movie:movies(id, title, image, genre, release_year),
-        tv_show:tv_shows(id, title, image, genre, release_year)
+        movie:movies(id, title, image, genre, release_year, rating),
+        tv_show:tv_shows(id, title, image, genre, release_year, rating)
       `)
       .eq("user_id", user.id)
       .order("id", { ascending: false }) as { data: WatchlistItem[] | null; error: Error | null };
@@ -83,7 +87,30 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  // Remove from watchlist
+  const fetchReviews = async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("reviews")
+      .select(`*, movies(*), tv_shows(*)`)
+      .eq("user_id", user.id)
+      .order("id", { ascending: false });
+    if (error) {
+      console.error("Error fetching reviews:", error);
+      alert("Failed to fetch reviews. Please try again.");
+    } else if (data) {
+      const formattedData = data.map((review) => ({
+        ...review,
+        media_type: review.movie_id ? "movie" : "tv_show",
+      }));
+      setReviews(formattedData);
+
+    }
+    console.log(data);
+    setLoading(false);
+  };
+
+      // Remove from watchlist
   const removeFromWatchlist = async (id: number) => {
     setLoading(true);
     const { error } = await supabase.from("watchlist").delete().eq("id", id);
@@ -98,6 +125,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user) fetchWatchlist();
+  }, [user]);
+
+  useEffect(() => {
+    if (user) fetchReviews();
   }, [user]);
 
   // Separate movies and tv shows
@@ -223,11 +254,30 @@ export default function Dashboard() {
           {/* My Reviews Card */}
           <div
             className="bg-white/10 dark:bg-gray-700/20 text-foreground rounded-lg p-4 shadow-md cursor-pointer flex justify-between items-center hover:bg-gray-400/20 transition-colors w-full"
-            onClick={() => alert("Open your reviews section")}
+            onClick={() => setShowReviews(!showReviews)}
           >
             <h2 className="text-lg font-semibold">My Reviews</h2>
             <span>▼</span>
           </div>
+          {showReviews && (
+            <div className="bg-white/5 dark:bg-gray-800/20 rounded-lg p-4 mt-2 border border-gray-300 dark:border-gray-700 space-y-4 w-full max-h-96 overflow-y-auto">
+              {reviews.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400">You have not written any reviews yet.</p>
+              ) : (
+                reviews.map((review) => (
+                  <div key={review.id} className="border-b border-gray-300 dark:border-gray-700 pb-2 mb-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                      <Link href={ review.media_type === "movie" ? `/Movies/${review.movie_id}` : `/TVShows/${review.tv_show_id}`} className="hover:underline">
+                      <strong>{review.media_type === "movie" ? review.movies?.title : review.tv_shows?.title} </strong> </Link>{review.media_type === "movie" ? "Movie" : "TV Show"}
+                    </p>
+                    <p className="text-sm text-yellow-400 mb-1"><strong>Rating:</strong> {review.rating} / 5</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400"><strong>Review:</strong> {review.review_text}</p>
+                  </div>
+                ))
+              )}
+            </div> 
+
+          )}
 
           {/* Watchlist Card */}
           <div
@@ -252,6 +302,7 @@ export default function Dashboard() {
                         key={item.id}
                         className="bg-background rounded-lg overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105 w-full"
                       >
+                        <Link href={`/Movies/${item.movie_id}`} className="flex flex-col flex-1">
                         <div className="relative w-full aspect-[2/3]">
                           <Image
                             src={item.movie?.image || ""}
@@ -266,7 +317,9 @@ export default function Dashboard() {
                           <h3 className="text-sm font-bold mb-1 truncate">{item.movie?.title}</h3>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">{item.movie?.genre}</p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Year: {item.movie?.release_year}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Rating: {item.movie?.rating}</p>
                         </div>
+                        </Link>
                         <div className="p-2">
                           <button
                             onClick={() => removeFromWatchlist(item.id)}
@@ -291,6 +344,7 @@ export default function Dashboard() {
                         key={item.id}
                         className="bg-background rounded-lg overflow-hidden shadow-lg dark:border-gray-700 flex flex-col transition-transform hover:scale-105 w-full"
                       >
+                        <Link href={`/TVShows/${item.tv_show_id}`} className="flex flex-col flex-1">
                         <div className="relative w-full aspect-[2/3]">
                           <Image
                             src={item.tv_show?.image || ""}
@@ -305,7 +359,9 @@ export default function Dashboard() {
                           <h3 className="text-sm font-bold mb-1 truncate">{item.tv_show?.title}</h3>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">{item.tv_show?.genre}</p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Year: {item.tv_show?.release_year}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Rating: {item.tv_show?.rating}</p>
                         </div>
+                        </Link>
                         <div className="p-2">
                           <button
                             onClick={() => removeFromWatchlist(item.id)}
