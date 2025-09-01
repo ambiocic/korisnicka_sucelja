@@ -27,9 +27,22 @@ export default function Dashboard() {
     tv_show: Media | null;
   };
 
+  type ReviewItem = {
+    id: number;
+    user_id: string;
+    movie_id: number | null;
+    tv_show_id: number | null;
+    rating: number;
+    review_text: string;
+    created_at: string;
+    movies: Media | null;
+    tv_shows: Media | null;
+    media_type?: "movie" | "tv_show";
+  };
+
   const router = useRouter();
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [user, setUser] = useState<User | null>(null);
   // Removed unused loading state
   const [showAccountDetails, setShowAccountDetails] = useState(false);
