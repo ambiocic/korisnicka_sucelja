@@ -2,14 +2,9 @@
 
 import { Navigation } from "../components/Navigation";  
 import { Footer } from "../components/footer";
-import Image from "next/image";
 
 export default function AboutUs() {
-  const team = [
-    { name: "Alice Johnson", role: "Frontend Developer", image: "/team/alice.jpg" },
-    { name: "Bob Smith", role: "Backend Developer", image: "/team/bob.jpg" },
-    { name: "Catherine Lee", role: "Designer", image: "/team/catherine.jpg" },
-  ];
+
 
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col">

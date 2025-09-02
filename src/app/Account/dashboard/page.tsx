@@ -56,25 +56,11 @@ export default function Dashboard() {
   const watchlistRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
-  // State for overflow
-  const [watchlistOverflow, setWatchlistOverflow] = useState(false);
-  const [reviewsOverflow, setReviewsOverflow] = useState(false);
 
-  // Check overflow for arrows
-  useEffect(() => {
-    const checkOverflow = () => {
-      if (watchlistRef.current) {
-        setWatchlistOverflow(watchlistRef.current.scrollWidth > watchlistRef.current.clientWidth);
-      }
-      if (reviewsRef.current) {
-        setReviewsOverflow(reviewsRef.current.scrollWidth > reviewsRef.current.clientWidth);
-      }
-    };
+  
 
-    checkOverflow();
-    window.addEventListener("resize", checkOverflow);
-    return () => window.removeEventListener("resize", checkOverflow);
-  }, [watchlist, reviews]);
+
+
 
   // Scroll handlers
   const scrollLeft = (ref: React.RefObject<HTMLDivElement>) => {
@@ -332,7 +318,7 @@ export default function Dashboard() {
           {["account", "watchlist", "reviews"].map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab as any)}
+            onClick={() => setActiveTab(tab as "account" | "watchlist" | "reviews")}
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 activeTab === tab
                   ? "bg-yellow-400 text-black shadow"
@@ -385,22 +371,22 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                  {watchlistOverflow && (
                     <>
-                      <button
-                        onClick={() => scrollLeft(watchlistRef)}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-                      >
-                        ←
-                      </button>
-                      <button
-                        onClick={() => scrollRight(watchlistRef)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-                      >
-                        →
-                      </button>
-                    </>
-                  )}
+  <button
+    onClick={() => scrollLeft(watchlistRef)}
+    className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+  >
+    ←
+  </button>
+  <button
+    onClick={() => scrollRight(watchlistRef)}
+    className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+  >
+    →
+  </button>
+</>
+
+                  
                   <div
                     ref={watchlistRef}
                     className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 w-full no-scrollbar"
@@ -456,22 +442,23 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                  {reviewsOverflow && (
-                    <>
-                      <button
-                        onClick={() => scrollLeft(reviewsRef)}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-                      >
-                        ←
-                      </button>
-                      <button
-                        onClick={() => scrollRight(reviewsRef)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-                      >
-                        →
-                      </button>
-                    </>
-                  )}
+                  
+                  <>
+  <button
+    onClick={() => scrollLeft(reviewsRef)}
+    className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+  >
+    ←
+  </button>
+  <button
+    onClick={() => scrollRight(reviewsRef)}
+    className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+  >
+    →
+  </button>
+</>
+
+                  
                   <div
                     ref={reviewsRef}
                     className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 w-full no-scrollbar"
