@@ -8,6 +8,7 @@ import { User } from "@supabase/supabase-js";
 import { Footer } from "@/app/components/footer";
 import Link from "next/link";
 import Slider from "rc-slider";
+import { toast } from "react-toastify";
 import "rc-slider/assets/index.css";
 
 type Media = {
@@ -128,7 +129,7 @@ export default function TVShows() {
 
   const addToWatchlist = async (item: Media) => {
     if (!user) {
-      alert("Please sign in to add to your watchlist.");
+      toast.error("Please sign in to add to your watchlist.");
       return;
     }
     const { data: existing } = await supabase
@@ -139,7 +140,7 @@ export default function TVShows() {
       .single();
 
     if (existing) {
-      alert(`${item.title} is already in your watchlist!`);
+      toast.error(`${item.title} is already in your watchlist!`);
       return;
     }
 
@@ -147,8 +148,8 @@ export default function TVShows() {
       { user_id: user.id, movie_id: null, tv_show_id: item.id },
     ]);
 
-    if (error) alert("Failed to add item to watchlist.");
-    else alert(`${item.title} added to your watchlist!`);
+    if (error) toast.error("Failed to add item to watchlist.");
+    else toast.success(`${item.title} added to your watchlist!`);
   };
 
   return (

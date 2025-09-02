@@ -7,6 +7,7 @@ import { User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/app/components/footer";
+import { toast } from "react-toastify";
 
 type Media = {
   id: number;
@@ -89,17 +90,17 @@ export default function TVShowPage({ params }: PostProps) {
   }, [params]);
 
   const handleAddToWatchlist = async () => {
-    if (!user || !media) return alert("Sign in to add to watchlist.");
+    if (!user || !media) return toast.error("Sign in to add to watchlist.");
     const { data: existing } = await supabase
       .from("watchlist")
       .select("id")
       .eq("user_id", user.id)
       .eq("tv_show_id", media.id)
       .single();
-    if (existing) return alert("Already in watchlist.");
+    if (existing) return toast.error("Already in watchlist.");
     const { error } = await supabase.from("watchlist").insert([{ user_id: user.id, movie_id: null, tv_show_id: media.id }]);
-    if (error) return alert("Failed to add to watchlist.");
-    alert("Added to watchlist!");
+    if (error) return toast.error("Failed to add to watchlist.");
+    toast.success("Added to watchlist!");
   };
 
   const handleReviewSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -123,7 +124,7 @@ export default function TVShowPage({ params }: PostProps) {
         },
       ]));
     }
-    if (error) return alert("Failed to submit review.");
+    if (error) return toast.error("Failed to submit review.");
     setNewReview({ rating: 0, text: "" });
     const reviewsData = await getReviews(media.id.toString());
     setReviews(reviewsData);
@@ -139,7 +140,9 @@ export default function TVShowPage({ params }: PostProps) {
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this review?")) return;
     const { error } = await supabase.from("reviews").delete().eq("id", id);
-    if (error) return alert("Failed to delete review.");
+    if (error) return toast.error("Failed to delete review.");
+    else
+      toast.success("Review deleted.");
     setReviews((prev) => prev.filter((r) => r.id !== id));
   };
 
