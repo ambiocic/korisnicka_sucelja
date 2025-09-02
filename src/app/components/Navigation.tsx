@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FaFilm, FaTv, FaUserAlt, FaInfoCircle, FaBars, FaTimes } from "react-icons/fa";
+import {
+  FaFilm,
+  FaTv,
+  FaUserAlt,
+  FaInfoCircle,
+  FaBars,
+  FaTimes,
+} from "react-icons/fa";
 import { Logo } from "./Logo";
 import { supabase } from "@/lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
@@ -24,9 +31,11 @@ export function Navigation() {
     fetchUser();
 
     // Auth state change listener
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+      },
+    );
 
     return () => {
       listener.subscription.unsubscribe();
@@ -39,7 +48,11 @@ export function Navigation() {
     { title: "Movies", path: "/Movies", icon: <FaFilm /> },
     { title: "TV Shows", path: "/TVShows", icon: <FaTv /> },
     user
-      ? { title: "Your Account", path: "/Account/dashboard", icon: <FaUserAlt /> }
+      ? {
+          title: "Your Account",
+          path: "/Account/dashboard",
+          icon: <FaUserAlt />,
+        }
       : { title: "Log In / Register", path: "/Account", icon: <FaUserAlt /> },
     { title: "About Us", path: "/AboutUs", icon: <FaInfoCircle /> },
   ];
@@ -48,14 +61,18 @@ export function Navigation() {
   const processPage = (
     page: { title: string; path: string; icon: JSX.Element | null },
     index: number,
-    closeMenu: () => void
+    closeMenu: () => void,
   ) => {
-    const isActive = pathname === page.path || (page.path === "/Account/dashboard" && pathname.startsWith("/Account"));
+    const isActive =
+      pathname === page.path ||
+      (page.path === "/Account/dashboard" && pathname.startsWith("/Account"));
     return (
       <li
         key={index}
         className={`flex items-center rounded-lg px-4 py-2 transition-all duration-300 ${
-          isActive ? "bg-yellow-400 text-yellow-400 border-b-2 border-yellow-400" : "hover:bg-yellow-400 hover:text-yellow-400"
+          isActive
+            ? "bg-yellow-400 text-yellow-400 border-b-2 border-yellow-400"
+            : "hover:bg-yellow-400 hover:text-yellow-400"
         }`}
       >
         <Link
@@ -63,7 +80,9 @@ export function Navigation() {
           onClick={closeMenu}
           className="flex items-center font-semibold text-white text-lg hover:scale-105 transition-transform duration-300"
         >
-          {page.icon && <span className="text-xl text-white mr-2">{page.icon}</span>}
+          {page.icon && (
+            <span className="text-xl text-white mr-2">{page.icon}</span>
+          )}
           <span>{page.title}</span>
         </Link>
       </li>
@@ -97,12 +116,16 @@ export function Navigation() {
 
         {/* Center Menu (Desktop) */}
         <div className="hidden md:flex space-x-6">
-          {pages.slice(1, 4).map((page, index) => processPage(page, index, () => {}))}
+          {pages
+            .slice(1, 4)
+            .map((page, index) => processPage(page, index, () => {}))}
         </div>
 
         {/* Right Side (Desktop) */}
         <div className="hidden md:flex items-center space-x-6">
-          {pages.slice(4).map((page, index) => processPage(page, index, () => {}))}
+          {pages
+            .slice(4)
+            .map((page, index) => processPage(page, index, () => {}))}
           {user && (
             <button
               onClick={async () => {
@@ -132,10 +155,16 @@ export function Navigation() {
       <div
         ref={menuRef}
         className={`md:hidden absolute top-20 left-0 right-0 bg-gray-800/95 backdrop-blur-sm p-4 space-y-4 transform transition-all duration-300 ${
-          isMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+          isMenuOpen
+            ? "translate-x-0 opacity-100"
+            : "translate-x-full opacity-0"
         }`}
       >
-        {pages.slice(1).map((page, index) => processPage(page, index, () => setIsMenuOpen(false)))}
+        {pages
+          .slice(1)
+          .map((page, index) =>
+            processPage(page, index, () => setIsMenuOpen(false)),
+          )}
         {user && (
           <button
             onClick={async () => {

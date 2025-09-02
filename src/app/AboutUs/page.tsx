@@ -1,11 +1,9 @@
 "use client";
 
-import { Navigation } from "../components/Navigation";  
+import { Navigation } from "../components/Navigation";
 import { Footer } from "../components/footer";
 
 export default function AboutUs() {
-
-
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col">
       {/* Navigation Bar */}
@@ -20,8 +18,7 @@ export default function AboutUs() {
           <p className="text-gray-700 dark:text-gray-300 text-lg">
             Learn more about FilmNest and the team behind it!
           </p>
-                    <div className="absolute inset-0 bg-gray-800 opacity-10 rounded-xl animate-pulse-slow pointer-events-none z-0" />
-
+          <div className="absolute inset-0 bg-gray-800 opacity-10 rounded-xl animate-pulse-slow pointer-events-none z-0" />
         </div>
       </div>
 
@@ -45,8 +42,6 @@ export default function AboutUs() {
           movies you love.
         </p>
       </section>
-
-     
 
       {/* Footer */}
       <Footer />

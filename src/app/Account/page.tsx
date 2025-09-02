@@ -22,9 +22,16 @@ export default function AccountPage() {
     setSuccess(null);
 
     if (activeTab === "login") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) {
-        setError(error.message === "Invalid login credentials" ? "Invalid email or password." : error.message);
+        setError(
+          error.message === "Invalid login credentials"
+            ? "Invalid email or password."
+            : error.message,
+        );
         return;
       }
       router.push("/Account/dashboard");
@@ -42,7 +49,7 @@ export default function AccountPage() {
         setError(
           error.message.includes("User already registered")
             ? "This email is already registered."
-            : error.message
+            : error.message,
         );
         return;
       }

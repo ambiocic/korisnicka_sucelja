@@ -82,17 +82,20 @@ export default function TVShows() {
     updated = updated.filter(
       (m) =>
         m.release_year >= filterOptions.releaseYear[0] &&
-        m.release_year <= filterOptions.releaseYear[1]
+        m.release_year <= filterOptions.releaseYear[1],
     );
     updated = updated.filter(
       (m) =>
-        m.rating >= filterOptions.rating[0] && m.rating <= filterOptions.rating[1]
+        m.rating >= filterOptions.rating[0] &&
+        m.rating <= filterOptions.rating[1],
     );
 
     if (sortBy === "ratingDesc") updated.sort((a, b) => b.rating - a.rating);
     if (sortBy === "ratingAsc") updated.sort((a, b) => a.rating - b.rating);
-    if (sortBy === "nameAsc") updated.sort((a, b) => a.title.localeCompare(b.title));
-    if (sortBy === "nameDesc") updated.sort((a, b) => b.title.localeCompare(a.title));
+    if (sortBy === "nameAsc")
+      updated.sort((a, b) => a.title.localeCompare(b.title));
+    if (sortBy === "nameDesc")
+      updated.sort((a, b) => b.title.localeCompare(a.title));
 
     setFilteredShows(updated);
   }, [tvShows, sortBy, filterOptions]);
@@ -144,9 +147,9 @@ export default function TVShows() {
       return;
     }
 
-    const { error } = await supabase.from("watchlist").insert([
-      { user_id: user.id, movie_id: null, tv_show_id: item.id },
-    ]);
+    const { error } = await supabase
+      .from("watchlist")
+      .insert([{ user_id: user.id, movie_id: null, tv_show_id: item.id }]);
 
     if (error) toast.error("Failed to add item to watchlist.");
     else toast.success(`${item.title} added to your watchlist!`);
@@ -157,7 +160,6 @@ export default function TVShows() {
       <Navigation />
 
       <div className="mt-28 mx-4">
-   
         {/* Sort + Filter Button */}
         <div className="flex flex-wrap items-center mb-8 gap-2">
           {[
@@ -209,7 +211,8 @@ export default function TVShows() {
                 }
                 className="bg-blue-200 text-blue-800 px-3 py-1 rounded-lg shadow text-sm"
               >
-                Year: {filterOptions.releaseYear[0]} - {filterOptions.releaseYear[1]} ✕
+                Year: {filterOptions.releaseYear[0]} -{" "}
+                {filterOptions.releaseYear[1]} ✕
               </button>
             )}
             {(filterOptions.rating[0] > 0 || filterOptions.rating[1] < 10) && (
@@ -268,7 +271,9 @@ export default function TVShows() {
 
               {/* Release Year */}
               <div className="mb-6">
-                <label className="font-semibold mb-2 block">Release Year:</label>
+                <label className="font-semibold mb-2 block">
+                  Release Year:
+                </label>
                 <Slider
                   range
                   min={minYear}
@@ -282,13 +287,18 @@ export default function TVShows() {
                   }
                   styles={{
                     track: { backgroundColor: "#facc15" },
-                    handle: { borderColor: "#facc15", backgroundColor: "#facc15" },
+                    handle: {
+                      borderColor: "#facc15",
+                      backgroundColor: "#facc15",
+                    },
                     rail: { backgroundColor: "#e5e7eb" },
                   }}
                   className="px-2"
                   marks={{
-                    [filterOptions.releaseYear[0]]: `${filterOptions.releaseYear[0]}`,
-                    [filterOptions.releaseYear[1]]: `${filterOptions.releaseYear[1]}`,
+                    [filterOptions.releaseYear[0]]:
+                      `${filterOptions.releaseYear[0]}`,
+                    [filterOptions.releaseYear[1]]:
+                      `${filterOptions.releaseYear[1]}`,
                   }}
                 />
               </div>
@@ -310,13 +320,18 @@ export default function TVShows() {
                   }
                   styles={{
                     track: { backgroundColor: "#facc15" },
-                    handle: { borderColor: "#facc15", backgroundColor: "#facc15" },
+                    handle: {
+                      borderColor: "#facc15",
+                      backgroundColor: "#facc15",
+                    },
                     rail: { backgroundColor: "#e5e7eb" },
                   }}
                   className="px-2"
                   marks={{
-                    [filterOptions.rating[0]]: `${filterOptions.rating[0].toFixed(1)}`,
-                    [filterOptions.rating[1]]: `${filterOptions.rating[1].toFixed(1)}`,
+                    [filterOptions.rating[0]]:
+                      `${filterOptions.rating[0].toFixed(1)}`,
+                    [filterOptions.rating[1]]:
+                      `${filterOptions.rating[1].toFixed(1)}`,
                   }}
                 />
               </div>
@@ -339,7 +354,10 @@ export default function TVShows() {
                 key={tvShow.id}
                 className="bg-background rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-105 transition-transform"
               >
-                <Link href={`/TVShows/${tvShow.id}`} className="flex flex-col flex-1">
+                <Link
+                  href={`/TVShows/${tvShow.id}`}
+                  className="flex flex-col flex-1"
+                >
                   <div className="relative w-full aspect-[2/3]">
                     <Image
                       src={tvShow.image}
@@ -352,7 +370,9 @@ export default function TVShows() {
                   </div>
                   <div className="p-2 flex flex-col flex-1">
                     <h3 className="text-sm font-bold mb-1">{tvShow.title}</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{tvShow.genre}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {tvShow.genre}
+                    </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Year: {tvShow.release_year}
                     </p>
@@ -373,10 +393,8 @@ export default function TVShows() {
             ))}
           </div>
         </section>
-
       </div>
-              <Footer />
-
+      <Footer />
     </div>
   );
 }

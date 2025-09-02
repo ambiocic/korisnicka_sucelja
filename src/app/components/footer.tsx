@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
+import {
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaTwitter,
+} from "react-icons/fa";
 import { Logo } from "./Logo";
 import Link from "next/link";
 
@@ -28,21 +36,39 @@ export const Footer = () => {
             className={`mt-2 md:mt-4 space-y-2 ${sitemapOpen ? "block" : "hidden"} md:block text-white text-lg`}
           >
             <li>
-              <Link href="/Movies" className="text-white hover:text-yellow-400 block">Movies</Link>
+              <Link
+                href="/Movies"
+                className="text-white hover:text-yellow-400 block"
+              >
+                Movies
+              </Link>
             </li>
             <li>
-              <Link href="/TVShows" className="text-white hover:text-yellow-400 block">TV Shows</Link>
+              <Link
+                href="/TVShows"
+                className="text-white hover:text-yellow-400 block"
+              >
+                TV Shows
+              </Link>
             </li>
             <li>
-              <Link href="/Account" className="text-white hover:text-yellow-400 block">Account</Link>
+              <Link
+                href="/Account"
+                className="text-white hover:text-yellow-400 block"
+              >
+                Account
+              </Link>
             </li>
             <li>
-              <Link href="/AboutUs" className="text-white hover:text-yellow-400 block">About Us</Link>
+              <Link
+                href="/AboutUs"
+                className="text-white hover:text-yellow-400 block"
+              >
+                About Us
+              </Link>
             </li>
           </ul>
         </div>
-
-        
 
         {/* Contact */}
         <div className="text-center md:text-left w-full md:w-auto flex flex-col items-center md:items-start">
@@ -60,21 +86,61 @@ export const Footer = () => {
           </p>
           <p className="flex items-center justify-center md:justify-start mb-2">
             <FaPhone className="mr-2" />
-            <a href="tel:+385000000" className="text-white hover:text-yellow-400">+385 000 000</a>
+            <a
+              href="tel:+385000000"
+              className="text-white hover:text-yellow-400"
+            >
+              +385 000 000
+            </a>
           </p>
           <p className="flex items-center justify-center md:justify-start mb-2">
             <FaEnvelope className="mr-2" />
-            <a href="mailto:filmnest@fesb.hr" className="text-white hover:text-yellow-400">filmnest@fesb.hr</a>
+            <a
+              href="mailto:filmnest@fesb.hr"
+              className="text-white hover:text-yellow-400"
+            >
+              filmnest@fesb.hr
+            </a>
           </p>
           <div className="flex space-x-4 justify-center md:justify-start mt-4">
-            <a href="https://www.facebook.com/yourpage" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400"><FaFacebook size={24} /></a>
-            <a href="https://twitter.com/yourhandle" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400"><FaTwitter size={24} /></a>
-            <a href="https://www.instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400"><FaInstagram size={24} /></a>
-            <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400"><FaLinkedin size={24} /></a>
+            <a
+              href="https://www.facebook.com/yourpage"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-yellow-400"
+            >
+              <FaFacebook size={24} />
+            </a>
+            <a
+              href="https://twitter.com/yourhandle"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-yellow-400"
+            >
+              <FaTwitter size={24} />
+            </a>
+            <a
+              href="https://www.instagram.com/yourhandle"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-yellow-400"
+            >
+              <FaInstagram size={24} />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/yourprofile"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-yellow-400"
+            >
+              <FaLinkedin size={24} />
+            </a>
           </div>
         </div>
       </div>
-      <p className="text-center text-sm mt-8">&copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.</p>
+      <p className="text-center text-sm mt-8">
+        &copy; {new Date().getFullYear()} FilmNest. All Rights Reserved.
+      </p>
     </footer>
   );
 };

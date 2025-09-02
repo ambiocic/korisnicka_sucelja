@@ -9,9 +9,9 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'xl1200': '1200px',
+        xl1200: "1200px",
+      },
     },
+    plugins: [],
   },
-  plugins: [],
-},
-}
+};

@@ -45,7 +45,9 @@ export default function Dashboard() {
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"account" | "watchlist" | "reviews">("account");
+  const [activeTab, setActiveTab] = useState<
+    "account" | "watchlist" | "reviews"
+  >("account");
   const [showModal, setShowModal] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -55,12 +57,6 @@ export default function Dashboard() {
   // Refs for scrollable containers
   const watchlistRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
-
-
-  
-
-
-
 
   // Scroll handlers
   const scrollLeft = (ref: React.RefObject<HTMLDivElement>) => {
@@ -112,7 +108,9 @@ export default function Dashboard() {
       }
 
       // Update password
-      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
       if (updateError) throw updateError;
 
       setMessage("Password updated successfully!");
@@ -143,17 +141,22 @@ export default function Dashboard() {
   const fetchWatchlist = async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("watchlist")
-      .select(`
+      .select(
+        `
         id,
         movie_id,
         tv_show_id,
         movie:movies(id, title, image, genre, release_year, rating),
         tv_show:tv_shows(id, title, image, genre, release_year, rating)
-      `)
+      `,
+      )
       .eq("user_id", user.id)
-      .order("id", { ascending: false }) as { data: WatchlistItem[] | null; error: Error | null };
+      .order("id", { ascending: false })) as {
+      data: WatchlistItem[] | null;
+      error: Error | null;
+    };
 
     if (error) console.error(error);
     else if (data) setWatchlist(data);
@@ -223,29 +226,34 @@ export default function Dashboard() {
         <div className="rounded-2xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 w-full">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold">
-              Welcome, <span className="text-yellow-400">{user?.email?.split("@")[0]}</span>
+              Welcome,{" "}
+              <span className="text-yellow-400">
+                {user?.email?.split("@")[0]}
+              </span>
             </h1>
-            <p className="text-gray-500 dark:text-gray-600 mt-1">Here’s your personal dashboard.</p>
+            <p className="text-gray-500 dark:text-gray-600 mt-1">
+              Here’s your personal dashboard.
+            </p>
           </div>
-          
+
           <div className="flex gap-6">
             <div className="text-center">
               <p className="font-bold text-xl">{watchlist.length}</p>
               <p className="text-sm text-gray-400">Watchlist</p>
             </div>
-          
+
             <div className="text-center">
               <p className="font-bold text-xl">{reviews.length}</p>
               <p className="text-sm text-gray-400">Reviews</p>
             </div>
-            
           </div>
-        
         </div>
 
         {/* Message for Change Password */}
         {message && (
-          <div className={`p-4 rounded-lg text-center w-full ${message.includes("Error") ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+          <div
+            className={`p-4 rounded-lg text-center w-full ${message.includes("Error") ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}
+          >
             {message}
           </div>
         )}
@@ -257,7 +265,9 @@ export default function Dashboard() {
               <h2 className="text-xl font-semibold mb-4">Change Password</h2>
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Old Password</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Old Password
+                  </label>
                   <input
                     type="password"
                     value={oldPassword}
@@ -267,7 +277,9 @@ export default function Dashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    New Password
+                  </label>
                   <input
                     type="password"
                     value={newPassword}
@@ -277,7 +289,9 @@ export default function Dashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Confirm New Password
+                  </label>
                   <input
                     type="password"
                     value={confirmPassword}
@@ -318,14 +332,20 @@ export default function Dashboard() {
           {["account", "watchlist", "reviews"].map((tab) => (
             <button
               key={tab}
-            onClick={() => setActiveTab(tab as "account" | "watchlist" | "reviews")}
+              onClick={() =>
+                setActiveTab(tab as "account" | "watchlist" | "reviews")
+              }
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 activeTab === tab
                   ? "bg-yellow-400 text-black shadow"
                   : "bg-white/10 dark:bg-gray-700/20 text-foreground hover:bg-gray-400/20"
               }`}
             >
-              {tab === "account" ? "Account" : tab === "watchlist" ? "Watchlist" : "My Reviews"}
+              {tab === "account"
+                ? "Account"
+                : tab === "watchlist"
+                  ? "Watchlist"
+                  : "My Reviews"}
             </button>
           ))}
         </div>
@@ -336,11 +356,17 @@ export default function Dashboard() {
           {activeTab === "account" && user && (
             <div className="w-full">
               <div className="bg-white/90 dark:bg-gray-900/40 p-6 rounded-xl shadow-md space-y-3 w-full">
-                <p><strong>Username:</strong> {user.email?.split("@")[0]}</p>
-                <p><strong>Email:</strong> {user.email}</p>
+                <p>
+                  <strong>Username:</strong> {user.email?.split("@")[0]}
+                </p>
+                <p>
+                  <strong>Email:</strong> {user.email}
+                </p>
                 <p>
                   <strong>Account Created:</strong>{" "}
-                  {user.created_at ? new Date(user.created_at).toLocaleDateString("en-US") : "Unknown"}
+                  {user.created_at
+                    ? new Date(user.created_at).toLocaleDateString("en-US")
+                    : "Unknown"}
                 </p>
                 <div className="flex gap-4">
                   <button
@@ -371,29 +397,30 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                    <>
-  <button
-    onClick={() => scrollLeft(watchlistRef)}
-    className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-  >
-    ←
-  </button>
-  <button
-    onClick={() => scrollRight(watchlistRef)}
-    className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-  >
-    →
-  </button>
-</>
+                  <>
+                    <button
+                      onClick={() => scrollLeft(watchlistRef)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                    >
+                      ←
+                    </button>
+                    <button
+                      onClick={() => scrollRight(watchlistRef)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                    >
+                      →
+                    </button>
+                  </>
 
-                  
                   <div
                     ref={watchlistRef}
                     className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 w-full no-scrollbar"
                   >
                     {watchlistMovies.concat(watchlistTVShows).map((item) => {
                       const media = item.movie || item.tv_show;
-                      const link = item.movie ? `/Movies/${item.movie_id}` : `/TVShows/${item.tv_show_id}`;
+                      const link = item.movie
+                        ? `/Movies/${item.movie_id}`
+                        : `/TVShows/${item.tv_show_id}`;
                       return (
                         <div
                           key={item.id}
@@ -409,13 +436,20 @@ export default function Dashboard() {
                                 className="w-full h-full rounded-t-xl"
                                 unoptimized
                               />
-                             
                             </div>
                             <div className="p-3 flex flex-col flex-1">
-                              <h3 className="text-sm md:text-base font-semibold truncate">{media?.title}</h3>
-                              <p className="text-[10px] md:text-sm text-gray-400 mb-1 truncate">{media?.genre}</p>
-                              <p className="text-[10px] md:text-sm text-gray-400">Year: {media?.release_year}</p>
-                              <p className="text-[10px] md:text-sm text-yellow-400">Rating: {media?.rating}</p>
+                              <h3 className="text-sm md:text-base font-semibold truncate">
+                                {media?.title}
+                              </h3>
+                              <p className="text-[10px] md:text-sm text-gray-400 mb-1 truncate">
+                                {media?.genre}
+                              </p>
+                              <p className="text-[10px] md:text-sm text-gray-400">
+                                Year: {media?.release_year}
+                              </p>
+                              <p className="text-[10px] md:text-sm text-yellow-400">
+                                Rating: {media?.rating}
+                              </p>
                             </div>
                           </Link>
                           <button
@@ -442,23 +476,21 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                  
                   <>
-  <button
-    onClick={() => scrollLeft(reviewsRef)}
-    className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-  >
-    ←
-  </button>
-  <button
-    onClick={() => scrollRight(reviewsRef)}
-    className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
-  >
-    →
-  </button>
-</>
+                    <button
+                      onClick={() => scrollLeft(reviewsRef)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                    >
+                      ←
+                    </button>
+                    <button
+                      onClick={() => scrollRight(reviewsRef)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400/50 text-yellow-400 p-4 rounded-full shadow-md text-2xl z-10 hover:bg-yellow-400/70 transition-colors"
+                    >
+                      →
+                    </button>
+                  </>
 
-                  
                   <div
                     ref={reviewsRef}
                     className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 w-full no-scrollbar"
@@ -469,10 +501,16 @@ export default function Dashboard() {
                         className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-gray-100/90 rounded-xl shadow-md p-4 hover:shadow-2xl transition-transform hover:scale-105 flex flex-col overflow-visible group"
                       >
                         <Link
-                          href={review.movie_id ? `/Movies/${review.movie_id}` : `/TVShows/${review.tv_show_id}`}
+                          href={
+                            review.movie_id
+                              ? `/Movies/${review.movie_id}`
+                              : `/TVShows/${review.tv_show_id}`
+                          }
                           className="hover:underline font-bold mb-1 text-sm md:text-base truncate"
                         >
-                          {review.movie_id ? review.movies?.title : review.tv_shows?.title}
+                          {review.movie_id
+                            ? review.movies?.title
+                            : review.tv_shows?.title}
                         </Link>
                         <p className="text-xs md:text-sm text-gray-400 mb-1">
                           Type: {review.movie_id ? "Movie" : "TV Show"}

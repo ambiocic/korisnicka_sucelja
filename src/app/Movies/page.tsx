@@ -77,20 +77,22 @@ export default function Movies() {
     updated = updated.filter(
       (m) =>
         m.release_year >= filterOptions.releaseYear[0] &&
-        m.release_year <= filterOptions.releaseYear[1]
+        m.release_year <= filterOptions.releaseYear[1],
     );
     updated = updated.filter(
       (m) =>
         (m.rating || 0) >= filterOptions.rating[0] &&
-        (m.rating || 0) <= filterOptions.rating[1]
+        (m.rating || 0) <= filterOptions.rating[1],
     );
 
     if (sortBy === "ratingDesc")
       updated.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     if (sortBy === "ratingAsc")
       updated.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-    if (sortBy === "nameAsc") updated.sort((a, b) => a.title.localeCompare(b.title));
-    if (sortBy === "nameDesc") updated.sort((a, b) => b.title.localeCompare(a.title));
+    if (sortBy === "nameAsc")
+      updated.sort((a, b) => a.title.localeCompare(b.title));
+    if (sortBy === "nameDesc")
+      updated.sort((a, b) => b.title.localeCompare(a.title));
 
     setFilteredMovies(updated);
   }, [movies, sortBy, filterOptions]);
@@ -154,7 +156,6 @@ export default function Movies() {
       <Navigation />
       <div className="mt-28 mx-4 flex-1">
         {/* Hero */}
-        
 
         {/* Sort + Filter Button */}
         <div className="flex flex-wrap items-center mb-8 gap-2">
@@ -182,7 +183,6 @@ export default function Movies() {
           >
             Filters
           </button>
-
         </div>
 
         {/* Active Filters */}
@@ -223,18 +223,16 @@ export default function Movies() {
                 {filterOptions.rating[1].toFixed(1)} ✕
               </button>
             )}
-                      {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white shadow transition"
-            >
-              Clear All ✕
-            </button>
-          )}
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white shadow transition"
+              >
+                Clear All ✕
+              </button>
+            )}
           </div>
-          
         )}
-
 
         {/* Filter Side Panel */}
         {isFilterOpen && (
@@ -286,23 +284,25 @@ export default function Movies() {
                   }
                   styles={{
                     track: { backgroundColor: "#facc15" },
-                    handle: { borderColor: "#facc15", backgroundColor: "#facc15" },
+                    handle: {
+                      borderColor: "#facc15",
+                      backgroundColor: "#facc15",
+                    },
                     rail: { backgroundColor: "#e5e7eb" },
                   }}
-
                   className="px-2"
                   marks={{
-                    [filterOptions.releaseYear[0]]: `${filterOptions.releaseYear[0]}`,
-                    [filterOptions.releaseYear[1]]: `${filterOptions.releaseYear[1]}`,
+                    [filterOptions.releaseYear[0]]:
+                      `${filterOptions.releaseYear[0]}`,
+                    [filterOptions.releaseYear[1]]:
+                      `${filterOptions.releaseYear[1]}`,
                   }}
                 />
               </div>
 
               {/* Rating */}
               <div className="mb-6">
-                <label className="font-semibold mb-2 block">
-                  Rating:
-                </label>
+                <label className="font-semibold mb-2 block">Rating:</label>
                 <Slider
                   range
                   min={0}
@@ -317,15 +317,18 @@ export default function Movies() {
                   }
                   styles={{
                     track: { backgroundColor: "#facc15" },
-                    handle: { borderColor: "#facc15", backgroundColor: "#facc15" },
+                    handle: {
+                      borderColor: "#facc15",
+                      backgroundColor: "#facc15",
+                    },
                     rail: { backgroundColor: "#e5e7eb" },
                   }}
-
-                 
                   className="px-2"
                   marks={{
-                    [filterOptions.rating[0]]: `${filterOptions.rating[0].toFixed(1)}`,
-                    [filterOptions.rating[1]]: `${filterOptions.rating[1].toFixed(1)}`,
+                    [filterOptions.rating[0]]:
+                      `${filterOptions.rating[0].toFixed(1)}`,
+                    [filterOptions.rating[1]]:
+                      `${filterOptions.rating[1].toFixed(1)}`,
                   }}
                 />
               </div>
@@ -348,7 +351,10 @@ export default function Movies() {
                 key={movie.id}
                 className="bg-background rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-105 transition-transform"
               >
-                <Link href={`/Movies/${movie.id}`} className="flex flex-col flex-1">
+                <Link
+                  href={`/Movies/${movie.id}`}
+                  className="flex flex-col flex-1"
+                >
                   <div className="relative w-full aspect-[2/3]">
                     <Image
                       src={movie.image}
@@ -361,7 +367,9 @@ export default function Movies() {
                   </div>
                   <div className="p-2 flex flex-col flex-1">
                     <h3 className="text-sm font-bold mb-1">{movie.title}</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{movie.genre}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {movie.genre}
+                    </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Year: {movie.release_year}
                     </p>
@@ -382,9 +390,8 @@ export default function Movies() {
             ))}
           </div>
         </section>
-
       </div>
-        <Footer />
+      <Footer />
     </div>
   );
 }
