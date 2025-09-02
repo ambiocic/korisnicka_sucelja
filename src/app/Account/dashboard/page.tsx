@@ -238,12 +238,16 @@ export default function Dashboard() {
 
           <div className="flex gap-6">
             <div className="text-center">
-              <p className="font-bold text-xl dark:text-white">{watchlist.length}</p>
+              <p className="font-bold text-xl dark:text-white">
+                {watchlist.length}
+              </p>
               <p className="text-sm dark:text-white text-gray-400">Watchlist</p>
             </div>
 
             <div className="text-center">
-              <p className="font-bold text-xl dark:text-white">{reviews.length}</p>
+              <p className="font-bold text-xl dark:text-white">
+                {reviews.length}
+              </p>
               <p className="text-sm dark:text-white text-gray-400">Reviews</p>
             </div>
           </div>

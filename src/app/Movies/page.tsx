@@ -160,45 +160,45 @@ export default function Movies() {
         {/* Sort + Filter Button */}
         <div className="flex flex-wrap items-center mb-8 gap-2">
           <div className="hidden sm:flex gap-2">
-          {[
-            { label: "Rating ↓", value: "ratingDesc" },
-            { label: "Rating ↑", value: "ratingAsc" },
-            { label: "A-Z", value: "nameAsc" },
-            { label: "Z-A", value: "nameDesc" },
-          ].map((option) => (
-            <button
-              key={option.value}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                sortBy === option.value
-                  ? "bg-yellow-400 text-white shadow-lg"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-300"
-              }`}
-              onClick={() => setSortBy(option.value)}
-            >
-              {option.label}
-            </button>
-          ))}
+            {[
+              { label: "Rating ↓", value: "ratingDesc" },
+              { label: "Rating ↑", value: "ratingAsc" },
+              { label: "A-Z", value: "nameAsc" },
+              { label: "Z-A", value: "nameDesc" },
+            ].map((option) => (
+              <button
+                key={option.value}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  sortBy === option.value
+                    ? "bg-yellow-400 text-white shadow-lg"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-300"
+                }`}
+                onClick={() => setSortBy(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
 
-             {/* Mobile dropdown */}
-    <div className="sm:hidden ">
-      <select
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-        className="w-full px-4 py-2 rounded-lg  dark:bg-gray-900 dark:text-white dark:border-gray-900"
-      >
-        {[
-          { label: "Rating ↓", value: "ratingDesc" },
-          { label: "Rating ↑", value: "ratingAsc" },
-          { label: "A-Z", value: "nameAsc" },
-          { label: "Z-A", value: "nameDesc" },
-        ].map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
+          {/* Mobile dropdown */}
+          <div className="sm:hidden ">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg  dark:bg-gray-900 dark:text-white dark:border-gray-900"
+            >
+              {[
+                { label: "Rating ↓", value: "ratingDesc" },
+                { label: "Rating ↑", value: "ratingAsc" },
+                { label: "A-Z", value: "nameAsc" },
+                { label: "Z-A", value: "nameDesc" },
+              ].map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <button
             onClick={() => setIsFilterOpen(true)}
@@ -325,7 +325,9 @@ export default function Movies() {
 
               {/* Rating */}
               <div className="mb-6">
-                <label className="font-semibold mb-2 block dark:text-white">Rating:</label>
+                <label className="font-semibold mb-2 block dark:text-white">
+                  Rating:
+                </label>
                 <Slider
                   range
                   min={0}
