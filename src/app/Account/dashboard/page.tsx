@@ -225,26 +225,26 @@ export default function Dashboard() {
         {/* Welcome / Stats */}
         <div className="rounded-2xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 w-full">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold">
+            <h1 className="text-3xl md:text-4xl font-bold dark:text-white">
               Welcome,{" "}
               <span className="text-yellow-400">
                 {user?.email?.split("@")[0]}
               </span>
             </h1>
-            <p className="text-gray-500 dark:text-gray-600 mt-1">
+            <p className="text-gray-500 dark:text-white mt-1">
               Here’s your personal dashboard.
             </p>
           </div>
 
           <div className="flex gap-6">
             <div className="text-center">
-              <p className="font-bold text-xl">{watchlist.length}</p>
-              <p className="text-sm text-gray-400">Watchlist</p>
+              <p className="font-bold text-xl dark:text-white">{watchlist.length}</p>
+              <p className="text-sm dark:text-white text-gray-400">Watchlist</p>
             </div>
 
             <div className="text-center">
-              <p className="font-bold text-xl">{reviews.length}</p>
-              <p className="text-sm text-gray-400">Reviews</p>
+              <p className="font-bold text-xl dark:text-white">{reviews.length}</p>
+              <p className="text-sm dark:text-white text-gray-400">Reviews</p>
             </div>
           </div>
         </div>
@@ -337,8 +337,8 @@ export default function Dashboard() {
               }
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 activeTab === tab
-                  ? "bg-yellow-400 text-black shadow"
-                  : "bg-white/10 dark:bg-gray-700/20 text-foreground hover:bg-gray-400/20"
+                  ? "bg-yellow-400 text-black shadow dark:text-white"
+                  : "bg-white/10 dark:bg-gray-700/40 text-foreground dark:text-gray-400 hover:bg-gray-400/20"
               }`}
             >
               {tab === "account"
@@ -355,7 +355,7 @@ export default function Dashboard() {
           {/* Account */}
           {activeTab === "account" && user && (
             <div className="w-full">
-              <div className="bg-white/90 dark:bg-gray-900/40 p-6 rounded-xl shadow-md space-y-3 w-full">
+              <div className="bg-white/90 dark:bg-gray-900/40 dark:text-white p-6 rounded-xl shadow-md space-y-3 w-full">
                 <p>
                   <strong>Username:</strong> {user.email?.split("@")[0]}
                 </p>
@@ -392,7 +392,7 @@ export default function Dashboard() {
           {activeTab === "watchlist" && (
             <div className="w-full relative">
               {watchlist.length === 0 ? (
-                <div className="bg-white/90 dark:bg-gray-900/40 p-6 rounded-xl shadow-md text-gray-500 dark:text-gray-600 w-full text-center">
+                <div className="bg-white/90 dark:bg-black p-6 rounded-xl shadow-md text-gray-500 dark:text-white w-full text-center">
                   Your watchlist is empty.
                 </div>
               ) : (
@@ -424,7 +424,7 @@ export default function Dashboard() {
                       return (
                         <div
                           key={item.id}
-                          className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-gray-900/40 rounded-xl shadow-md hover:shadow-2xl transition-transform hover:scale-105 relative overflow-visible group"
+                          className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-black dark:border dark:border-gray-900 rounded-xl shadow-md hover:shadow-2xl transition-transform hover:scale-105 relative overflow-visible group"
                         >
                           <Link href={link} className="flex flex-col">
                             <div className="relative w-full aspect-[2/3]">
@@ -441,10 +441,10 @@ export default function Dashboard() {
                               <h3 className="text-sm md:text-base font-semibold truncate">
                                 {media?.title}
                               </h3>
-                              <p className="text-[10px] md:text-sm text-gray-400 mb-1 truncate">
+                              <p className="text-[10px] md:text-sm text-gray-400 dark:text-white mb-1 truncate">
                                 {media?.genre}
                               </p>
-                              <p className="text-[10px] md:text-sm text-gray-400">
+                              <p className="text-[10px] md:text-sm text-gray-400 dark:text-white">
                                 Year: {media?.release_year}
                               </p>
                               <p className="text-[10px] md:text-sm text-yellow-400">
@@ -454,7 +454,7 @@ export default function Dashboard() {
                           </Link>
                           <button
                             onClick={() => removeFromWatchlist(item.id)}
-                            className="absolute bottom-4 right-2 bg-red-500 text-white p-1 rounded-lg shadow-md text-sm  hover:bg-red-600 transition-opacity"
+                            className="absolute bottom-4 right-2 bg-red-500 text-white font-bold p-1 rounded-lg shadow-md text-sm  hover:bg-red-600 transition-opacity"
                           >
                             Remove
                           </button>
@@ -498,7 +498,7 @@ export default function Dashboard() {
                     {reviews.map((review) => (
                       <div
                         key={review.id}
-                        className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-gray-100/90 rounded-xl shadow-md p-4 hover:shadow-2xl transition-transform hover:scale-105 flex flex-col overflow-visible group"
+                        className="flex-none w-40 sm:w-44 md:w-48 lg:w-52 bg-white/90 dark:bg-black dark:border dark:border-gray-900 rounded-xl shadow-md p-4 hover:shadow-2xl transition-transform hover:scale-105 flex flex-col overflow-visible group"
                       >
                         <Link
                           href={
@@ -512,13 +512,13 @@ export default function Dashboard() {
                             ? review.movies?.title
                             : review.tv_shows?.title}
                         </Link>
-                        <p className="text-xs md:text-sm text-gray-400 mb-1">
+                        <p className="text-xs md:text-sm text-gray-400 dark:text-white mb-1">
                           Type: {review.movie_id ? "Movie" : "TV Show"}
                         </p>
                         <p className="text-xs md:text-sm text-yellow-400 mb-2">
                           <strong>Rating:</strong> {review.rating}/5
                         </p>
-                        <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 line-clamp-4">
+                        <p className="text-sm md:text-base text-gray-700 dark:text-white line-clamp-4">
                           {review.review_text}
                         </p>
                       </div>

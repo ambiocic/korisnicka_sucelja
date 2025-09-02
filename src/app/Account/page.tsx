@@ -114,7 +114,7 @@ export default function AccountPage() {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-foreground focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
+                  className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -132,7 +132,7 @@ export default function AccountPage() {
                 <input
                   type="password"
                   placeholder="Enter your password"
-                  className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-foreground focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
+                  className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -151,7 +151,7 @@ export default function AccountPage() {
                   <input
                     type="password"
                     placeholder="Confirm your password"
-                    className="w-full p-3 pl-10 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-foreground focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
+                    className="w-full p-3 pl-10 dark:text-white rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-foreground focus:outline-none focus:ring-2 focus:ring-yellow-400 hover:ring-2 hover:ring-yellow-400/50 transition-all duration-300"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required

@@ -162,6 +162,8 @@ export default function TVShows() {
       <div className="mt-28 mx-4">
         {/* Sort + Filter Button */}
         <div className="flex flex-wrap items-center mb-8 gap-2">
+                    <div className="hidden sm:flex gap-2">
+
           {[
             { label: "Rating ↓", value: "ratingDesc" },
             { label: "Rating ↑", value: "ratingAsc" },
@@ -180,9 +182,32 @@ export default function TVShows() {
               {option.label}
             </button>
           ))}
+
+</div>
+
+             {/* Mobile dropdown */}
+    <div className="sm:hidden ">
+      <select
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        className="w-full px-4 py-2 rounded-lg  dark:bg-gray-900 dark:text-white dark:border-gray-900"
+      >
+        {[
+          { label: "Rating ↓", value: "ratingDesc" },
+          { label: "Rating ↑", value: "ratingAsc" },
+          { label: "A-Z", value: "nameAsc" },
+          { label: "Z-A", value: "nameDesc" },
+        ].map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+
           <button
             onClick={() => setIsFilterOpen(true)}
-            className="ml-auto px-4 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow transition"
+            className="ml-auto px-4 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow transition font-semibold"
           >
             Filters
           </button>
@@ -200,6 +225,8 @@ export default function TVShows() {
                 {g} ✕
               </button>
             ))}
+
+            
             {(filterOptions.releaseYear[0] > minYear ||
               filterOptions.releaseYear[1] < maxYear) && (
               <button
@@ -271,7 +298,7 @@ export default function TVShows() {
 
               {/* Release Year */}
               <div className="mb-6">
-                <label className="font-semibold mb-2 block">
+                <label className="font-semibold mb-2 block dark:text-white">
                   Release Year:
                 </label>
                 <Slider
@@ -305,7 +332,7 @@ export default function TVShows() {
 
               {/* Rating */}
               <div className="mb-6">
-                <label className="font-semibold mb-2 block">Rating:</label>
+                <label className="font-semibold mb-2 block dark:text-white">Rating:</label>
                 <Slider
                   range
                   min={0}
@@ -352,7 +379,7 @@ export default function TVShows() {
             {filteredShows.map((tvShow) => (
               <div
                 key={tvShow.id}
-                className="bg-background rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-105 transition-transform"
+                className="bg-background  rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-105 transition-transform"
               >
                 <Link
                   href={`/TVShows/${tvShow.id}`}
@@ -370,13 +397,13 @@ export default function TVShows() {
                   </div>
                   <div className="p-2 flex flex-col flex-1">
                     <h3 className="text-sm font-bold mb-1">{tvShow.title}</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <p className="text-xs text-gray-500 dark:text-white mb-1">
                       {tvShow.genre}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-white">
                       Year: {tvShow.release_year}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-yellow-500">
                       Rating: {tvShow.rating.toFixed(1)}
                     </p>
                   </div>
@@ -384,7 +411,7 @@ export default function TVShows() {
                 <div className="p-2">
                   <button
                     onClick={() => addToWatchlist(tvShow)}
-                    className=" bg-yellow-400 text-white  py-1 px-2 rounded hover:bg-yellow-500 w-full"
+                    className="bg-yellow-400 text-white font-semibold py-1 px-2 rounded hover:bg-yellow-500 w-full "
                   >
                     Add to Watchlist
                   </button>

@@ -136,13 +136,13 @@ export default function Home() {
   );
 
   return (
-    <div className="bg-background text-gray-900 min-h-screen">
+    <div className="bg-background  text-gray-900 min-h-screen">
       <Navigation />
       <div className="mt-28 mx-4 md:mx-8">
         {/* Hero Section */}
-        <div className="relative w-full flex flex-col items-start justify-center py-8 md:py-12 px-4 md:px-6 mb-10 animate-fadeIn">
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-3 leading-tight md:leading-snug tracking-tight">
-            <span className="text-yellow-500 drop-shadow-md">Film</span>
+        <div className="  relative w-full flex flex-col items-start justify-center py-8 md:py-12 px-4 md:px-6 mb-10 animate-fadeIn">
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-2  md:mb-3 leading-tight md:leading-snug tracking-tight">
+            <span className="text-yellow-500   drop-shadow-md">Film</span>
             <span className="text-black dark:text-white drop-shadow-sm ml-1">
               Nest
             </span>
@@ -150,8 +150,6 @@ export default function Home() {
           <p className="text-gray-400 font-medium text-lg md:text-xl max-w-xl mt-2">
             Discover your next favorite movie or TV show!
           </p>
-          {/* Subtle animated gray overlay */}
-          <div className="absolute inset-0 bg-gray-800 opacity-10 rounded-xl animate-pulse-slow pointer-events-none z-0" />
         </div>
 
         {/* Recommended Movies */}

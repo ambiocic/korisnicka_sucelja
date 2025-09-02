@@ -181,7 +181,7 @@ export default function TVShowPage({ params }: PostProps) {
         </div>
 
         {/* TV Show Card */}
-        <div className=" border dark:border-gray-800 w-full max-w-4xl bg-white dark:bg-black p-6 rounded-lg  shadow-md flex flex-col md:flex-row gap-6">
+        <div className="border dark:text-white dark:border-gray-900 w-full max-w-4xl bg-white dark:bg-black p-6 rounded-lg shadow-md flex flex-col md:flex-row gap-6">
           {media.image && (
             <div className="flex flex-col items-center w-full md:w-1/3">
               <div className="relative w-full aspect-[2/3] mb-4 rounded-lg overflow-hidden">
@@ -203,14 +203,14 @@ export default function TVShowPage({ params }: PostProps) {
 
           <div className="flex-1 flex flex-col justify-start">
             <h1 className="text-3xl font-extrabold mb-2">{media.title}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            <p className="text-sm text-gray-500 dark:text-white mb-1">
               Genre: {media.genre || "N/A"}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-500 dark:text-white mb-4">
               Release Year: {media.release_year || "N/A"}
             </p>
             {media.rating !== null && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-sm text-yellow-500 mb-4">
                 Rating: {media.rating} ★
               </p>
             )}
@@ -317,7 +317,7 @@ export default function TVShowPage({ params }: PostProps) {
       {/* Review Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-950 p-6 rounded-lg w-full max-w-md relative">
+          <div className="bg-white dark:bg-gray-950 dark:text-white p-6 rounded-lg w-full max-w-md relative">
             <button
               onClick={toggleModal}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
@@ -329,7 +329,7 @@ export default function TVShowPage({ params }: PostProps) {
             </h3>
             <form onSubmit={handleReviewSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-semibold mb-1">
+                <label className="block text-sm font-semibold mb-1 dark:text-white">
                   Rating:
                 </label>
                 <div className="flex gap-1">
@@ -348,7 +348,7 @@ export default function TVShowPage({ params }: PostProps) {
                 </div>
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-semibold mb-1">
+                <label className="dark:text-white block text-sm font-semibold mb-1">
                   Your Review:
                 </label>
                 <textarea
@@ -356,7 +356,7 @@ export default function TVShowPage({ params }: PostProps) {
                   onChange={(e) =>
                     setNewReview({ ...newReview, text: e.target.value })
                   }
-                  className="w-full p-2 border dark:bg-gray-800 border-gray-700 rounded-lg focus:outline-none focus:ring focus:ring-yellow-300"
+                  className="w-full p-2 border dark:bg-gray-800 dark:text-white border-gray-700 rounded-lg focus:outline-none focus:ring focus:ring-yellow-300"
                   rows={4}
                   placeholder="Write your review..."
                 />
@@ -365,13 +365,13 @@ export default function TVShowPage({ params }: PostProps) {
                 <button
                   type="button"
                   onClick={toggleModal}
-                  className="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400"
+                  className="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-400"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600"
+                  className="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600"
                 >
                   {editReviewId ? "Save Changes" : "Submit"}
                 </button>

@@ -10,20 +10,19 @@ export default function AboutUs() {
       <Navigation />
 
       {/* Hero Section */}
-      <div className="relative bg-cover bg-center h-64 mb-12 mx-4 mt-28 rounded-lg overflow-hidden shadow-lg">
+      <div className="relative bg-cover bg-center h-64 mb-2 mx-4 mt-28 rounded-lg overflow-hidden ">
         <div className="relative w-full flex flex-col items-start justify-center py-8 md:py-12 px-4 md:px-6 mb-10 animate-fadeIn">
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-3 leading-tight md:leading-snug tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-3 leading-tight md:leading-snug tracking-tight dark:text-white">
             About <span className="text-yellow-400">Us</span>
           </h1>
-          <p className="text-gray-700 dark:text-gray-300 text-lg">
+          <p className="text-gray-700 dark:text-white text-lg">
             Learn more about FilmNest and the team behind it!
           </p>
-          <div className="absolute inset-0 bg-gray-800 opacity-10 rounded-xl animate-pulse-slow pointer-events-none z-0" />
         </div>
       </div>
 
       {/* About Section */}
-      <section className="max-w-4xl mx-auto mb-16 px-4 space-y-6 text-lg text-gray-700 dark:text-gray-300">
+      <section className="max-w-4xl mx-auto mb-16 px-4 space-y-6 text-lg text-gray-700 dark:text-white">
         <p>
           FilmNest is a passionate community of movie and TV show enthusiasts.
           Our mission is to help viewers discover, track, and enjoy the best
