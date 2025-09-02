@@ -149,9 +149,9 @@ export default function Movies() {
   };
 
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
       <Navigation />
-      <div className="mt-28 mx-4">
+      <div className="mt-28 mx-4 flex-1">
         {/* Hero */}
         
 
@@ -382,8 +382,8 @@ export default function Movies() {
           </div>
         </section>
 
-        <Footer />
       </div>
+        <Footer />
     </div>
   );
 }

@@ -55,15 +55,15 @@ export function Navigation() {
       <li
         key={index}
         className={`flex items-center rounded-lg px-4 py-2 transition-all duration-300 ${
-          isActive ? "bg-yellow-400/20 text-yellow-400 border-b-2 border-yellow-400" : "hover:bg-yellow-400/20 hover:text-yellow-400"
+          isActive ? "bg-yellow-400 text-yellow-400 border-b-2 border-yellow-400" : "hover:bg-yellow-400 hover:text-yellow-400"
         }`}
       >
         <Link
           href={page.path}
           onClick={closeMenu}
-          className="flex items-center font-semibold text-lg hover:scale-105 transition-transform duration-300"
+          className="flex items-center font-semibold text-white text-lg hover:scale-105 transition-transform duration-300"
         >
-          {page.icon && <span className="text-xl mr-2">{page.icon}</span>}
+          {page.icon && <span className="text-xl text-white mr-2">{page.icon}</span>}
           <span>{page.title}</span>
         </Link>
       </li>
@@ -90,7 +90,7 @@ export function Navigation() {
   }, [isMenuOpen]);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/40 p-6 shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-800 p-6 shadow-lg">
       <div className="max-w-7xl mx-auto flex justify-between items-center w-full">
         {/* Logo */}
         <Logo />
@@ -110,7 +110,7 @@ export function Navigation() {
                 setUser(null);
                 router.push("/Account");
               }}
-              className="bg-red-500/90 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 hover:scale-105 transition-all duration-300"
+              className="bg-red-500/90 font-semibold text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 hover:scale-105 transition-all duration-300"
             >
               Logout
             </button>

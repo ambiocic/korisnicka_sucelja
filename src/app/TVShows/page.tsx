@@ -373,8 +373,9 @@ export default function TVShows() {
           </div>
         </section>
 
-        <Footer />
       </div>
+              <Footer />
+
     </div>
   );
 }

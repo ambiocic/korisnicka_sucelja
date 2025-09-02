@@ -65,21 +65,21 @@ export default function AccountPage() {
               onClick={() => setActiveTab("login")}
               className={`flex-1 py-3 px-4 text-lg font-semibold rounded-lg transition-all duration-300 ${
                 activeTab === "login"
-                  ? "bg-yellow-400/20 text-yellow-400 border-b-2 border-yellow-400"
+                  ? "bg-yellow-400/20 text-yellow-400 border-2 border-yellow-400"
                   : "bg-gray-200 dark:bg-gray-800/20 text-gray-900 dark:text-gray-100 hover:bg-yellow-400/20 hover:text-yellow-400"
               }`}
             >
-              Log In
+              Log into your account.
             </button>
             <button
               onClick={() => setActiveTab("register")}
               className={`flex-1 py-3 px-4 text-lg font-semibold rounded-lg transition-all duration-300 ${
                 activeTab === "register"
-                  ? "bg-yellow-400/20 text-yellow-400 border-b-2 border-yellow-400"
+                  ? "bg-yellow-400/20 text-yellow-400 border-2 border-yellow-400"
                   : "bg-gray-200 dark:bg-gray-800/20 text-gray-900 dark:text-gray-100 hover:bg-yellow-400/20 hover:text-yellow-400"
               }`}
             >
-              Register
+              Create a new account.
             </button>
           </div>
 
