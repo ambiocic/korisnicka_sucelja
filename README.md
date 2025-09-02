@@ -19,7 +19,7 @@
 ### Semester Project
 
 - Link to your production version: [**Production Version**](https://korisnicka-sucelja-ruby.vercel.app) <!-- Replace with actual URL -->
-- Link to your final report: [**Final Report**](URL_TO_FINAL_REPORT) <!-- Replace with actual URL -->
+- Link to your final report: [**Final Report**](https://marred-yttrium-ec6.notion.site/FilmNest-26159d52998b80c995bae4433da2d959) <!-- Replace with actual URL -->
 <!-- Add more as necessary -->
 
 ### Semester Assignments
